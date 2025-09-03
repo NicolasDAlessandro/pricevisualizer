@@ -1,0 +1,8 @@
+# Activa mod_rewrite
+RewriteEngine On
+RewriteBase /api/
+
+# Redirige todas las rutas de la API a index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
