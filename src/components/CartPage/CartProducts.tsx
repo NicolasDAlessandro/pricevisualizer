@@ -33,7 +33,7 @@ const CartProducts: React.FC = () => {
             <td className="py-2 border border-black">
               ${it.product.precio.toFixed(2)}
             </td>
-            <td className="py-2 border border-black">
+            <td className="py-2 border border-black-700">
               <input
                 type="number"
                 min={0}
@@ -41,7 +41,7 @@ const CartProducts: React.FC = () => {
                 onChange={(e) =>
                   setQty(it.product.codigo, Math.max(0, Number(e.target.value)))
                 }
-                className="w-16 border rounded px-2 py-1 text-center"
+                className="w-16 bg-gray-900 text-white border border-gray-600 rounded px-2 py-1 text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </td>
             <td className="py-2 border border-black">

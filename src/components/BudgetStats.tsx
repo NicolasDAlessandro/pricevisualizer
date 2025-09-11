@@ -43,7 +43,7 @@ const BudgetStats: React.FC = () => {
 
   return (
     <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Estadísticas de Presupuestos</h2>
+      <h2 className="text-xl text-center font-bold mb-4">Estadísticas de Presupuestos</h2>
 
       {/* Filtros */}
       <div className="flex flex-wrap gap-2 mb-4 items-center">
@@ -79,11 +79,11 @@ const BudgetStats: React.FC = () => {
       {/* Resumen */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
         <div className="bg-blue-100 p-4 rounded shadow text-center">
-          <p className="text-lg font-bold">{filteredBudgets.length}</p>
+          <p className="text-lg font-bold text-blue-500">{filteredBudgets.length}</p>
           <p className="text-sm text-gray-600">Presupuestos</p>
         </div>
         <div className="bg-green-100 p-4 rounded shadow text-center">
-          <p className="text-lg font-bold">${totalMonto.toFixed(2)}</p>
+          <p className="text-lg font-bold text-blue-500">${totalMonto.toFixed(2)}</p>
           <p className="text-sm text-gray-600">Monto total</p>
         </div>
       </div>

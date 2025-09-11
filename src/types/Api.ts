@@ -1,4 +1,4 @@
-// Tipos para la comunicación con el backend .NET
+// Tipos para la comunicación con el backend
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -35,18 +35,20 @@ export interface UserDto {
   lastName: string;
 }
 
-// src/types/Api.ts
 export interface ProductDto {
-  id?: Number; 
+  id?: Number;
   name: string;
-  description?: string; 
+  description?: string;
   price: number;
   stock: number;
+  stock_centro?: number;     
+  stock_deposito?: number;  
   category?: string;
   sellerId?: string;
-  sellerName?: string; 
-  updatedAt?: string;  
+  sellerName?: string;
+  updatedAt?: string;
 }
+
 
 
 export interface CreateProductDto {
@@ -89,6 +91,16 @@ export interface BudgetDto {
   createdAt: string;
   updatedAt: string;
 }
+
+export type SellerDto = {
+  id: number;
+  nombre: string;
+  apellido: string;
+  numeroVendedor: number;
+  activo: boolean;
+  createdAt: string;
+};
+
 
 // Configuración de la API
 export const API_CONFIG = {

@@ -25,6 +25,8 @@ if (strpos($path, '/api/auth') === 0) {
     require_once 'routes/payments.php';
 } elseif (strpos($path, '/api/budgets') === 0) {
     require_once 'routes/budgets.php';
+} elseif (strpos($path, '/api/sellers') === 0) {
+    require_once 'routes/seller.php';
 } elseif (strpos($path, '/api/test') === 0) {
     require_once __DIR__ . '/routes/testdb.php';
 } else {

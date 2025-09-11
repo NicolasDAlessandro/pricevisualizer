@@ -38,8 +38,7 @@ const ProductTable: React.FC = () => {
     const q = searchQuery.toLowerCase();
     return allProducts.filter((p) =>
       p.name.toLowerCase().includes(q) ||
-      (p.description ?? "").toLowerCase().includes(q) ||
-      (p.category ?? "").toLowerCase().includes(q)
+      (p.description ?? "").toLowerCase().includes(q)
     );
   }, [allProducts, searchQuery]);
 
@@ -108,16 +107,16 @@ const ProductTable: React.FC = () => {
         handleClear={handleClear}
       />
 
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-h-[600px] overflow-y-auto">
-        <table className="w-full text-sm text-left text-gray-500 border-gray-300">
-          <thead className="text-xs text-white uppercase bg-blue-800 sticky top-0 shadow text-center">
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg max-h-[600px] overflow-y-auto border border-gray-700 bg-gray-800">
+        <table className="w-full text-sm text-center text-gray-300 border-collapse">
+          <thead className="text-xs text-white uppercase bg-blue-700 sticky top-0 shadow">
             <tr>
-              <th className="px-6 py-3">Código</th>
-              <th className="px-6 py-3">Nombre</th>
-              <th className="px-6 py-3">Stock</th>
-              <th className="px-6 py-3">Precio</th>
-              <th className="px-6 py-3">Categoría</th>
-              <th className="px-6 py-3">Acciones</th>
+              <th className="px-6 py-3 border border-gray-600">Código</th>
+              <th className="px-6 py-3 border border-gray-600">Nombre</th>
+              <th className="px-6 py-3 border border-gray-600">Gasloni</th>
+              <th className="px-6 py-3 border border-gray-600">Italhogar</th>
+              <th className="px-6 py-3 border border-gray-600">Precio</th>
+              <th className="px-6 py-3 border border-gray-600">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -126,26 +125,26 @@ const ProductTable: React.FC = () => {
                 <React.Fragment key={`${prod.id ?? idx}`}>
                   <tr
                     onClick={() => toggleExpand(prod.id)}
-                    className={`cursor-pointer ${
+                    className={`cursor-pointer transition ${
                       idx % 2 === 0
-                        ? "bg-white border-b hover:bg-gray-50"
-                        : "bg-gray-50 border-b hover:bg-gray-100"
+                        ? "bg-gray-800 hover:bg-gray-700 border-b border-gray-700"
+                        : "bg-gray-700 hover:bg-gray-600 border-b border-gray-600"
                     }`}
                   >
-                    <td className="px-6 py-4 text-center">{prod.id}</td>
+                    <td className="px-6 py-4">{prod.id}</td>
                     <td className="px-6 py-4">{prod.name}</td>
-                    <td className="px-6 py-4 text-center">{prod.stock}</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4">{prod.stock}</td>
+                    <td className="px-6 py-4">{prod.stock_centro ?? 0}</td>
+                    <td className="px-6 py-4 text-blue-400">
                       ${prod.price.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 text-center">{prod.category}</td>
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 py-4">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleAgregar(prod);
                         }}
-                        className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition shadow"
                       >
                         Agregar
                       </button>
@@ -153,8 +152,8 @@ const ProductTable: React.FC = () => {
                   </tr>
 
                   {expandedRow === prod.id && (
-                    <tr className="bg-blue-50">
-                      <td colSpan={6} className="px-6 py-4">
+                    <tr className="bg-gray-900">
+                      <td colSpan={6} className="px-6 py-4 border-t border-gray-700">
                         <PaymentOptions price={prod.price} />
                       </td>
                     </tr>
@@ -163,7 +162,10 @@ const ProductTable: React.FC = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                <td
+                  colSpan={6}
+                  className="px-6 py-4 text-center text-gray-400 italic"
+                >
                   No se encontraron productos.
                 </td>
               </tr>

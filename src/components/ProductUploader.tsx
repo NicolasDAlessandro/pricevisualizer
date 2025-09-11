@@ -36,13 +36,17 @@ const ProductUploader: React.FC = () => {
 
             const price = Number(String(norm["precio"] ?? "0").replace(",", "."));
             const stock = Number(String(norm["stock"] ?? "0").replace(",", "."));
+            const stockCentro = Number(String(norm["stock1_a"] ?? "0").replace(",", "."));
+            const stockDeposito = Number(String(norm["stock1_b"] ?? "0").replace(",", "."));
 
             return {
-              id: Number(norm["codigo"] ?? 0), // requerido upsert
+              id: Number(norm["codigo"] ?? 0), 
               name: String(norm["detalle"] ?? "").trim(),
               description: String(norm["detalle"] ?? "").trim(),
               price: Number.isFinite(price) ? price : 0,
               stock: Number.isFinite(stock) ? stock : 0,
+              stock_centro: Number.isFinite(stockCentro) ? stockCentro : 0,   
+              stock_deposito: Number.isFinite(stockDeposito) ? stockDeposito : 0, 
               category: String(norm["rubro"] ?? "General").trim() || "",
               imageUrl: norm["imagen"] ? String(norm["imagen"]) : null,
             };
@@ -69,7 +73,7 @@ const ProductUploader: React.FC = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-150px)] px-4">
       <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
-        <h2 className="text-lg font-semibold mb-4 text-center">Actualizar productos desde Excel</h2>
+        <h2 className="text-xl font-bold text-gray-700 text-center p-5">Actualizar productos desde Excel</h2>
         <input
           type="file"
           accept=".xlsx, .xls"

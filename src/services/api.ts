@@ -4,7 +4,7 @@ import { API_CONFIG } from '../types/Api';
 import type { LoginResponse, ApiResponse, ProductDto} from '../types/Api';
 import type { BulkUploadResponse } from '../types/BulkUploadResponse';
 import type { PaymentDto } from '../types/Api';
-
+import type { SellerDto } from '../types/Api';
 // Configuración base de axios
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -134,6 +134,8 @@ export const productService = {
       description: p.description,
       price: Number(p.price),
       stock: Number(p.stock),
+      stock_centro: Number(p.stock_centro ?? 0),   
+      stock_deposito: Number(p.stock_deposito ?? 0), 
       category: p.category,
       imageUrl: p.image_url,
       sellerId: p.seller_id,
@@ -282,6 +284,56 @@ export const budgetService = {
 
   rejectBudget: async (id: string) => {
     return apiRequest('POST', API_CONFIG.ENDPOINTS.BUDGETS.REJECT(id));
+  },
+};
+
+export const sellerService = {
+  getAll: async (all = false): Promise<SellerDto[]> => {
+    const respRaw = await apiRequest<any>(
+      "GET",
+      all ? "/sellers?all=1" : "/sellers"
+    );
+
+    let parsed: any;
+    if (typeof respRaw === "string") {
+      try {
+        const jsonStart = respRaw.indexOf("{");
+        const clean = respRaw.slice(jsonStart);
+        parsed = JSON.parse(clean);
+      } catch (err) {
+        console.error("Error parseando respuesta de sellers:", err);
+        return [];
+      }
+    } else {
+      parsed = respRaw;
+    }
+
+    const sellers = Array.isArray(parsed.data) ? parsed.data : [];
+
+    return sellers.map((s: any): SellerDto => ({
+      id: Number(s.id),
+      nombre: s.nombre,
+      apellido: s.apellido,
+      numeroVendedor: Number(s.numero_vendedor),
+      activo: Boolean(s.activo),
+      createdAt: s.created_at,
+    }));
+  },
+
+  create: async (seller: {
+    nombre: string;
+    apellido: string;
+    numeroVendedor: number;
+  }) => {
+    return apiRequest("POST", "/sellers", seller);
+  },
+
+  activate: async (id: number) => {
+    return apiRequest("PATCH", `/sellers/${id}/activate`);
+  },
+
+  deactivate: async (id: number) => {
+    return apiRequest("PATCH", `/sellers/${id}/deactivate`);
   },
 };
 

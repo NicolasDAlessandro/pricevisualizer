@@ -130,12 +130,14 @@ elseif ($method === 'POST' && $path === '/api/products/bulk') {
     //$user = verifyAuth($pdo); // 
     
     $data = json_decode(file_get_contents('php://input'), true);
-    
+
     if (!isset($data['products']) || !is_array($data['products'])) {
         http_response_code(400);
         echo json_encode(["success" => false, "message" => "Datos de productos no válidos"]);
         exit;
     }
+    
+    $productModel->deactivateAll();
     
     $products = [];
     $errors = [];
@@ -164,12 +166,14 @@ elseif ($method === 'POST' && $path === '/api/products/bulk') {
             'description' => strval($productData['description'] ?? $productData['name']),
             'price' => floatval($productData['price']),
             'stock' => intval($productData['stock']),
+            'stock_centro' => intval($productData['stock_centro'] ?? 0),
+            'stock_deposito' => intval($productData['stock_deposito'] ?? 0),
             'category' => strval($productData['category'] ?? 'General'),
             'imageUrl' => $productData['imageUrl'] ?? null,
             'sellerId' => 1 // Valor fijo para pruebas
         ];
     }
-    
+    // Validar que haya productos válidos
     if (empty($products)) {
         http_response_code(400);
         echo json_encode([

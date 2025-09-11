@@ -11,7 +11,7 @@ const NavButton: React.FC = () => {
   };
 
   return (
-    <nav className="bg-white shadow">
+    <nav className="bg-white shadow ">
       <div className="max-w-screen-xl mx-auto flex items-center justify-between p-4">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-3" onClick={() => handleClick("/")}>

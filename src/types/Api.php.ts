@@ -41,6 +41,7 @@ export interface ProductDto {
   description?: string; 
   price: number;
   stock: number;
+  stock_centro?: number;
   category?: string;
   imageUrl?: string;
   sellerId?: string;

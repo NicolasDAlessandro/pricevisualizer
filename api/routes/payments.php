@@ -4,15 +4,18 @@ require_once __DIR__ . "/../config/cors.php";
 
 header('Content-Type: application/json');
 
+// Obtener método y ruta
 $method = $_SERVER['REQUEST_METHOD'];
 $path   = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+// Extraer la parte de la ruta después de /api/payments
 $basePath = "/api/payments";
 $subPath = substr($path, strlen($basePath));
  
 try {
+    // Crear un nuevo pago
     if ($method === "POST" && $subPath === "") {
-        // Crear pago
+        
         $input = json_decode(file_get_contents("php://input"), true);
 
         $amount       = $input["amount"] ?? 0;
@@ -48,9 +51,9 @@ try {
         ]);
         exit;
     }
-
+    // Listar todos los pagos
     if ($method === "GET" && $subPath === "") {
-        // Listar todos los pagos
+        
         $stmt = $pdo->query("SELECT * FROM payments ORDER BY description ASC");
         $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -60,7 +63,7 @@ try {
         ]);
         exit;
     }
-
+    
     if ($method === "PUT" && preg_match("#^/([0-9]+)$#", $subPath, $matches)) {
         $id = (int)$matches[1];
         $input = json_decode(file_get_contents("php://input"), true);

@@ -17,16 +17,21 @@ export type ProductoItem = {
   precio: number;
   qty: number;
 };
+export type PresupuestoPorProducto = {
+  producto: string;
+  opciones: PresupuestoItem[];
+};
 
 export const generarPDF = async (
-  items: ProductoItem[],  
-  presupuesto: PresupuestoItem[],
+  items: ProductoItem[],
+  presupuesto: PresupuestoItem[] | PresupuestoPorProducto[],
+  seller?: { nombre: string; apellido: string; numeroVendedor: number }
 ) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
   const pageHeight = doc.internal.pageSize.height;
 
-  // ---  Logo encabezado
+  // --- Logo encabezado
   doc.addImage(logo, "PNG", 0, 0, pageWidth, 40);
 
   // --- Línea bajo logo
@@ -34,16 +39,24 @@ export const generarPDF = async (
   doc.setLineWidth(1.2);
   doc.line(0, 42, pageWidth, 42);
 
-  // ---  Fecha debajo del logo
+  // --- Fecha debajo del logo
   const fecha = new Date().toLocaleDateString();
   doc.setFontSize(10);
   doc.text(`${fecha}`, pageWidth - 14, 50, { align: "right" });
+  if (seller) {
+    doc.setFontSize(10);
+    doc.text(
+      `Vendedor: ${seller.nombre} ${seller.apellido} N° ${seller.numeroVendedor}`,
+      14,
+      50
+    );
+  }
 
   // --- Título centrado
   doc.setFontSize(18);
   doc.text("Presupuesto", pageWidth / 2, 60, { align: "center" });
 
-  // ---  Tabla de productos
+  // --- Tabla de productos
   const productRows = items.map((it) => [
     it.detalle,
     `$${it.precio.toFixed(2)}`,
@@ -72,76 +85,109 @@ export const generarPDF = async (
     },
   });
 
-  // ---  Tabla de formas de pago
-  const paymentRows = presupuesto.map((p) => [
-    p.nombre,
-    p.cuotas,
-    `$${p.montoCuota.toFixed(2)}`,
-    `$${p.total.toFixed(2)}`,
-  ]);
+  // Detectar tipo de presupuesto
+  const esIndividual = (presupuesto as PresupuestoPorProducto[])[0]?.opciones !== undefined;
 
-  autoTable(doc, {
-    head: [["Forma de pago", "Cuotas", "Monto cuota", "Total"]],
-    body: paymentRows,
-    theme: "grid",
-    headStyles: {
-      fillColor: [22, 160, 133],
-      textColor: 255,
-      fontStyle: "bold",
-      halign: "center",
-    },
-    styles: {
-      fontSize: 11,
-      halign: "center",
-      cellPadding: 3,
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245],
-    },
-  });
+  if (!esIndividual) {
+    // Presupuesto general
+    const paymentRows = (presupuesto as PresupuestoItem[]).map((p) => [
+      p.nombre,
+      p.cuotas,
+      `$${p.montoCuota.toFixed(2)}`,
+      `$${p.total.toFixed(2)}`,
+    ]);
 
-  // FOOTER
+    autoTable(doc, {
+      head: [["Forma de pago", "Cuotas", "Monto cuota", "Total"]],
+      body: paymentRows,
+      theme: "grid",
+      headStyles: {
+        fillColor: [22, 160, 133],
+        textColor: 255,
+        fontStyle: "bold",
+        halign: "center",
+      },
+      styles: {
+        fontSize: 11,
+        halign: "center",
+        cellPadding: 3,
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245],
+      },
+    });
+  } else {
+    // Presupuesto individual por producto
+    let lastY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 20 : 80;
+
+    (presupuesto as PresupuestoPorProducto[]).forEach((grupo) => {
+      if ((doc as any).lastAutoTable && (doc as any).lastAutoTable.finalY + 60 > pageHeight) {
+        doc.addPage();
+        lastY = 40; 
+      } else {
+        lastY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 20 : 80;
+      }
+
+      // Título del producto
+      doc.setFontSize(14);
+      doc.text(`${grupo.producto}`, pageWidth / 2, lastY, {
+        align: "center",
+      });
+
+      const paymentRows = grupo.opciones.map((p) => [
+        p.nombre,
+        p.cuotas,
+        `$${p.montoCuota.toFixed(2)}`,
+        `$${p.total.toFixed(2)}`,
+      ]);
+
+      autoTable(doc, {
+        head: [["Forma de pago", "Cuotas", "Monto cuota", "Total"]],
+        body: paymentRows,
+        startY: lastY + 10,
+        theme: "grid",
+        headStyles: {
+          fillColor: [22, 160, 133],
+          textColor: 255,
+          fontStyle: "bold",
+          halign: "center",
+        },
+        styles: {
+          fontSize: 11,
+          halign: "center",
+          cellPadding: 3,
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245],
+        },
+      });
+    });
+  }
+
+  // --- FOOTER
   const footerHeight = 20;
   const footerY = pageHeight - footerHeight;
-  const iconSize = 4.5; 
-
-  // Línea divisoria superior
+  const iconSize = 4.5;
   doc.setDrawColor(22, 160, 133);
   doc.setLineWidth(1);
   doc.line(0, footerY, pageWidth, footerY);
 
-  // Fuente reducida
   doc.setFontSize(8);
-
-  // --- Distribución en 4 columnas iguales
   const colWidth = pageWidth / 4;
 
-  const addFooterItem = (
-    icon: string,
-    text: string,
-    colIndex: number
-  ) => {
-    const startX = colWidth * colIndex + 10; 
+  const addFooterItem = (icon: string, text: string, colIndex: number) => {
+    const startX = colWidth * colIndex + 10;
     const iconY = footerY + 6;
     const textY = footerY + 9;
 
     doc.addImage(icon, "PNG", startX, iconY, iconSize, iconSize);
-
-    doc.text(text, startX + iconSize + 2, textY); 
+    doc.text(text, startX + iconSize + 2, textY);
   };
 
-  // --- Dirección
   addFooterItem(locationIcon, "Av. Pres. Perón 3832, Rosario", 0);
-
-  // --- WhatsApp
   addFooterItem(whatsappIcon, "+54 9 341 623-3382", 1);
-
-  // --- Instagram
   addFooterItem(instagramIcon, "@gaslonihogar", 2);
-
-  // --- Web
   addFooterItem(web, "www.gasloni.com.ar", 3);
 
-  // Guardar
   doc.save("presupuesto.pdf");
 };

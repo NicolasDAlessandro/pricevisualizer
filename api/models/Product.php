@@ -7,20 +7,21 @@ class Product {
     }
 
     public function create($productData) {
-        $sql = "INSERT INTO products (name, description, price, stock, category, image_url, seller_id) 
-                VALUES (:name, :description, :price, :stock, :category, :image_url, :seller_id)";
-        
-        $stmt = $this->pdo->prepare($sql);
+        $sql = "INSERT INTO products 
+        (name, description, price, stock, stock_centro, stock_deposito, category, image_url, seller_id) 
+        VALUES (:name, :description, :price, :stock, :stock_centro, :stock_deposito, :category, :image_url, :seller_id)";
         $stmt->execute([
             ':name' => $productData['name'],
             ':description' => $productData['description'],
             ':price' => $productData['price'],
             ':stock' => $productData['stock'],
+            ':stock_centro' => $productData['stock_centro'] ?? 0,
+            ':stock_deposito' => $productData['stock_deposito'] ?? 0,
             ':category' => $productData['category'],
             ':image_url' => $productData['imageUrl'] ?? null,
             ':seller_id' => $productData['sellerId']
         ]);
-        
+    
         return $this->pdo->lastInsertId();
     }
 
@@ -28,7 +29,7 @@ class Product {
         $sql = "SELECT p.*, u.username as seller_name 
                 FROM products p 
                 JOIN users u ON p.seller_id = u.id 
-                WHERE 1=1";
+                WHERE p.active = 1";
         
         $bindings = [];
         
@@ -74,26 +75,31 @@ class Product {
 
     public function update($id, $productData) {
         $sql = "UPDATE products SET 
-                name = :name, 
-                description = :description, 
-                price = :price, 
-                stock = :stock, 
-                category = :category, 
-                image_url = :image_url,
-                updated_at = CURRENT_TIMESTAMP
-                WHERE id = :id";
-        
+            name = :name, 
+            description = :description, 
+            price = :price, 
+            stock = :stock,
+            stock_centro = :stock_centro,
+            stock_deposito = :stock_deposito,
+            category = :category, 
+            image_url = :image_url,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = :id";
+
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
             ':name' => $productData['name'],
             ':description' => $productData['description'],
             ':price' => $productData['price'],
             ':stock' => $productData['stock'],
+            ':stock_centro' => $productData['stock_centro'] ?? 0,
+            ':stock_deposito' => $productData['stock_deposito'] ?? 0,
             ':category' => $productData['category'],
             ':image_url' => $productData['imageUrl'] ?? null,
             ':id' => $id
         ]);
     }
+
 
     public function delete($id) {
         $sql = "DELETE FROM products WHERE id = :id";
@@ -102,51 +108,62 @@ class Product {
     }
 
     public function bulkCreate($productsData) {
-    $sql = "INSERT INTO products (id, name, description, price, stock, category, image_url, seller_id)
-            VALUES (:id, :name, :description, :price, :stock, :category, :image_url, :seller_id)
-            ON DUPLICATE KEY UPDATE
-                name = VALUES(name),
-                description = VALUES(description),
-                price = VALUES(price),
-                stock = VALUES(stock),  
-                category = VALUES(category),
-                image_url = VALUES(image_url),
-                seller_id = VALUES(seller_id),
-                updated_at = CURRENT_TIMESTAMP";
+        $sql = "INSERT INTO products 
+        (id, name, description, price, stock, stock_centro, stock_deposito, category, image_url, seller_id, active)
+        VALUES (:id, :name, :description, :price, :stock, :stock_centro, :stock_deposito, :category, :image_url, :seller_id, 1)
+        ON DUPLICATE KEY UPDATE
+            name = VALUES(name),
+            description = VALUES(description),
+            price = VALUES(price),
+            stock = VALUES(stock),
+            stock_centro = VALUES(stock_centro),
+            stock_deposito = VALUES(stock_deposito),
+            category = VALUES(category),
+            image_url = VALUES(image_url),
+            seller_id = VALUES(seller_id),
+            active = 1,
+            updated_at = CURRENT_TIMESTAMP";
 
-    $stmt = $this->pdo->prepare($sql);
 
-    $successCount = 0;
-    $errors = [];
+        $stmt = $this->pdo->prepare($sql);
 
-    foreach ($productsData as $index => $productData) {
-        try {
-            $stmt->execute([
-                ':id' => $productData['id'],  
-                ':name' => $productData['name'],
-                ':description' => $productData['description'],
-                ':price' => $productData['price'],
-                ':stock' => $productData['stock'],
-                ':category' => $productData['category'],
-                ':image_url' => $productData['imageUrl'] ?? null,
-                ':seller_id' => $productData['sellerId']
-            ]);
-            $successCount++;
-        } catch (Exception $e) {
-            $errors[] = [
-                'index' => $index,
-                'product' => $productData['name'] ?? 'Unknown',
-                'error' => $e->getMessage()
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($productsData as $index => $productData) {
+            try {
+                $stmt->execute([
+                    ':id' => $productData['id'],  
+                    ':name' => $productData['name'],
+                    ':description' => $productData['description'],
+                    ':price' => $productData['price'],
+                    ':stock' => $productData['stock'],
+                    ':stock_centro' => $productData['stock_centro'],
+                    ':stock_deposito' => $productData['stock_deposito'],
+                    ':category' => $productData['category'],
+                    ':image_url' => $productData['imageUrl'] ?? null,
+                    ':seller_id' => $productData['sellerId']
+                ]);
+                $successCount++;
+            } catch (Exception $e) {
+                $errors[] = [
+                    'index' => $index,
+                    'product' => $productData['name'] ?? 'Unknown',
+                    'error' => $e->getMessage()
+                ];
+            }
+        }
+
+        return [
+            'successCount' => $successCount,
+            'errorCount' => count($errors),
+            'errors' => $errors
             ];
         }
-    }
 
-    return [
-        'successCount' => $successCount,
-        'errorCount' => count($errors),
-        'errors' => $errors
-        ];
+        public function deactivateAll() {
+            $sql = "UPDATE products SET active = 0";
+            return $this->pdo->exec($sql);
+        }
     }
-
-}
 ?>

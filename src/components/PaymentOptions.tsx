@@ -52,14 +52,14 @@ const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
   return (
     <div className="overflow-x-auto">
       {/*  Tabla scrolleable verticalmente */}
-      <div className="max-h-72 overflow-y-auto border rounded shadow-sm">
-        <table className="w-full text-sm border-collapse">
-          <thead className="bg-blue-100 sticky top-0">
+      <div className="max-h-72 overflow-y-auto border border-gray-700 rounded shadow-sm bg-gray-800">
+        <table className="w-full text-sm text-gray-300 border-collapse">
+          <thead className="sticky top-0 bg-blue-700 text-white uppercase text-xs">
             <tr className="text-center">
-              <th className="px-3 py-2 border">Forma de pago</th>
-              <th className="px-3 py-2 border">Cuotas</th>
-              <th className="px-3 py-2 border">Monto cuota</th>
-              <th className="px-3 py-2 border">Total</th>
+              <th className="px-3 py-2 border border-gray-600">Forma de pago</th>
+              <th className="px-3 py-2 border border-gray-600">Cuotas</th>
+              <th className="px-3 py-2 border border-gray-600">Monto cuota</th>
+              <th className="px-3 py-2 border border-gray-600">Total</th>
             </tr>
           </thead>
           <tbody className="text-center">
@@ -68,11 +68,18 @@ const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
               const cuota = total / method.cuotas;
 
               return (
-                <tr key={method.id} className="hover:bg-blue-50">
-                  <td className="px-3 py-2 border">{method.name}</td>
-                  <td className="px-3 py-2 border">{method.cuotas}</td>
-                  <td className="px-3 py-2 border">${cuota.toFixed(2)}</td>
-                  <td className="px-3 py-2 border">${total.toFixed(2)}</td>
+                <tr
+                  key={method.id}
+                  className="hover:bg-gray-700 transition border-b border-gray-700"
+                >
+                  <td className="px-3 py-2 border border-gray-600">{method.name}</td>
+                  <td className="px-3 py-2 border border-gray-600">{method.cuotas}</td>
+                  <td className="px-3 py-2 border border-gray-600 text-blue-400">
+                    ${cuota.toFixed(2)}
+                  </td>
+                  <td className="px-3 py-2 border border-gray-600 text-green-400">
+                    ${total.toFixed(2)}
+                  </td>
                 </tr>
               );
             })}

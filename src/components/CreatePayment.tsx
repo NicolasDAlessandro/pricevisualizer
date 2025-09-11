@@ -65,22 +65,27 @@ const CreatePayment: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-md w-full max-w-md"
+        className="bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md text-gray-200"
       >
-        <h2 className="text-2xl font-bold mb-6 text-center">Crear Pago</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center text-white">
+          Crear Pago
+        </h2>
 
         {error && (
-          <div className="mb-4 p-2 bg-red-100 text-red-700 rounded">
+          <div className="mb-4 p-2 bg-red-900 text-red-300 rounded">
             {error}
           </div>
         )}
 
         {/* Monto */}
         <div className="mb-5">
-          <label htmlFor="amount" className="block mb-1 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="amount"
+            className="block mb-1 text-sm font-medium text-gray-300"
+          >
             Intereses
           </label>
           <input
@@ -89,7 +94,7 @@ const CreatePayment: React.FC = () => {
             id="amount"
             value={payment.amount}
             onChange={handleChange}
-            className="block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="block w-full p-2 border border-gray-600 bg-gray-900 text-gray-200 rounded-md focus:ring-2 focus:ring-blue-500"
             required
             min="0"
             step="0.01"
@@ -98,7 +103,10 @@ const CreatePayment: React.FC = () => {
 
         {/* Forma de pago */}
         <div className="mb-5">
-          <label htmlFor="method" className="block mb-1 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="method"
+            className="block mb-1 text-sm font-medium text-gray-300"
+          >
             Forma de pago
           </label>
           <select
@@ -106,7 +114,7 @@ const CreatePayment: React.FC = () => {
             id="method"
             value={payment.method}
             onChange={handleChange}
-            className="block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="block w-full p-2 border border-gray-600 bg-gray-900 text-gray-200 rounded-md focus:ring-2 focus:ring-blue-500"
             required
           >
             <option value="">Seleccione método</option>
@@ -120,7 +128,10 @@ const CreatePayment: React.FC = () => {
 
         {/* Cantidad de cuotas */}
         <div className="mb-5">
-          <label htmlFor="installments" className="block mb-1 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="installments"
+            className="block mb-1 text-sm font-medium text-gray-300"
+          >
             Cantidad de cuotas
           </label>
           <input
@@ -131,13 +142,16 @@ const CreatePayment: React.FC = () => {
             onChange={handleChange}
             min={1}
             max={12}
-            className="block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="block w-full p-2 border border-gray-600 bg-gray-900 text-gray-200 rounded-md focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         {/* Descripción */}
         <div className="mb-5">
-          <label htmlFor="description" className="block mb-1 text-sm font-medium text-gray-700">
+          <label
+            htmlFor="description"
+            className="block mb-1 text-sm font-medium text-gray-300"
+          >
             Descripción
           </label>
           <textarea
@@ -146,7 +160,7 @@ const CreatePayment: React.FC = () => {
             value={payment.description}
             onChange={handleChange}
             rows={3}
-            className="block w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+            className="block w-full p-2 border border-gray-600 bg-gray-900 text-gray-200 rounded-md focus:ring-2 focus:ring-blue-500"
             placeholder="Descripción del pago..."
           />
         </div>
@@ -154,7 +168,7 @@ const CreatePayment: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-700 text-white py-2 rounded-lg hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 disabled:opacity-50"
+          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 disabled:opacity-50"
         >
           {loading ? "Procesando..." : "Crear Pago"}
         </button>
@@ -168,6 +182,7 @@ const CreatePayment: React.FC = () => {
         )}
       </form>
     </div>
+
   );
 };
 
