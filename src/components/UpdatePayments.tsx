@@ -32,7 +32,7 @@ const UpdatePayments: React.FC = () => {
         method: payment.method,
         installments: payment.installments,
         description: payment.description,
-        status: payment.status,
+        status: Number(payment.status),
       });
       setToastMessage("Pago actualizado correctamente");
     } catch (err: any) {
@@ -171,9 +171,8 @@ const UpdatePayments: React.FC = () => {
                       }}
                       className="bg-gray-900 text-white border border-gray-600 rounded px-2 py-1 w-32 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value="pending">Pendiente</option>
-                      <option value="completed">Completado</option>
-                      <option value="failed">Fallido</option>
+                      <option value="1">Activo</option>
+                      <option value="0">Inactivo</option>
                     </select>
                   </td>
 

@@ -6,6 +6,7 @@ export type PaymentMethod = {
   name: string;
   cuotas: number;
   recargo: number; // (0.1 = 10%)
+  metodo: string;
 };
 
 type PaymentMethodsListProps = {
@@ -24,9 +25,10 @@ const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
 
         const mapped = payments.map((p: any) => ({
           id: String(p.id),
-          name: p.description || p.method, 
+          name: p.description, 
           cuotas: Number(p.installments) || 1,
           recargo: p.amount, 
+          metodo : p.method,
         }));
 
 
@@ -64,7 +66,8 @@ const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
           </thead>
           <tbody className="text-center">
             {methods.map((method) => {
-              const total = price * (1 + method.recargo);
+
+              const total = method.metodo == "tarjeta" ? price * (1 + method.recargo): price * (1 - method.recargo);
               const cuota = total / method.cuotas;
 
               return (

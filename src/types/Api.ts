@@ -75,7 +75,7 @@ export interface PaymentDto {
   method: string;
   installments: number;
   description: string;
-  status: "pending" | "completed" | "failed";
+  status: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -140,6 +140,8 @@ export const API_CONFIG = {
       LIST: "/budgets",
       DETAIL: (id: string) => `/budgets/${id}`,
       SEND: (id: string) => `/budgets/${id}/send`,
+      UPDATE: (id: string) => `/budgets/${id}`,  
+      DELETE: (id: string) => `/budgets/${id}`,   
       ACCEPT: (id: string) => `/budgets/${id}/accept`,
       REJECT: (id: string) => `/budgets/${id}/reject`
     },

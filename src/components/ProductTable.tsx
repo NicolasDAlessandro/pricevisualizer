@@ -115,6 +115,7 @@ const ProductTable: React.FC = () => {
               <th className="px-6 py-3 border border-gray-600">Nombre</th>
               <th className="px-6 py-3 border border-gray-600">Gasloni</th>
               <th className="px-6 py-3 border border-gray-600">Italhogar</th>
+              <th className="px-6 py-3 border border-gray-600">Depósito</th>
               <th className="px-6 py-3 border border-gray-600">Precio</th>
               <th className="px-6 py-3 border border-gray-600">Acciones</th>
             </tr>
@@ -135,6 +136,7 @@ const ProductTable: React.FC = () => {
                     <td className="px-6 py-4">{prod.name}</td>
                     <td className="px-6 py-4">{prod.stock}</td>
                     <td className="px-6 py-4">{prod.stock_centro ?? 0}</td>
+                    <td className="px-6 py-4">{prod.stock_deposito ?? 0}</td>
                     <td className="px-6 py-4 text-blue-400">
                       ${prod.price.toFixed(2)}
                     </td>
@@ -153,7 +155,7 @@ const ProductTable: React.FC = () => {
 
                   {expandedRow === prod.id && (
                     <tr className="bg-gray-900">
-                      <td colSpan={6} className="px-6 py-4 border-t border-gray-700">
+                      <td colSpan={7} className="px-6 py-4 border-t border-gray-700">
                         <PaymentOptions price={prod.price} />
                       </td>
                     </tr>
@@ -163,7 +165,7 @@ const ProductTable: React.FC = () => {
             ) : (
               <tr>
                 <td
-                  colSpan={6}
+                  colSpan={7}
                   className="px-6 py-4 text-center text-gray-400 italic"
                 >
                   No se encontraron productos.

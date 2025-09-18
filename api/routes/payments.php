@@ -54,7 +54,7 @@ try {
     // Listar todos los pagos
     if ($method === "GET" && $subPath === "") {
         
-        $stmt = $pdo->query("SELECT * FROM payments ORDER BY description ASC");
+        $stmt = $pdo->query("SELECT * FROM payments WHERE status = 1 ORDER BY description ASC");
         $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         echo json_encode([

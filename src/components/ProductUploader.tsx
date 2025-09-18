@@ -35,9 +35,9 @@ const ProductUploader: React.FC = () => {
             );
 
             const price = Number(String(norm["precio"] ?? "0").replace(",", "."));
-            const stock = Number(String(norm["stock"] ?? "0").replace(",", "."));
-            const stockCentro = Number(String(norm["stock1_a"] ?? "0").replace(",", "."));
-            const stockDeposito = Number(String(norm["stock1_b"] ?? "0").replace(",", "."));
+            const stock = Number(String(norm["stock1_a"] ?? "0").replace(",", "."));
+            const stockCentro = Number(String(norm["stock1_b"] ?? "0").replace(",", "."));
+            const stockDeposito = Number(String(norm["stock5"] ?? "0").replace(",", "."));
 
             return {
               id: Number(norm["codigo"] ?? 0), 

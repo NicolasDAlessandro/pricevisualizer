@@ -71,6 +71,7 @@ const CartPage: React.FC = () => {
       const items: PresupuestoItem[] = [];
 
       selectedMethods.forEach((m) => {
+        console.log("Calculando método:", m.metodo);
         const base = subtotal;
         let garantiasExtra = 0;
 
@@ -79,7 +80,7 @@ const CartPage: React.FC = () => {
         });
 
         const totalBase = base + garantiasExtra;
-        const totalFinal = totalBase * (1 + m.recargo);
+        const totalFinal = m.metodo == "tarjeta" ? totalBase * (1 + m.recargo) : totalBase * (1 - m.recargo);
 
         items.push({
           nombre: m.name,
@@ -102,19 +103,20 @@ const CartPage: React.FC = () => {
     } else {
       // --- Modo INDIVIDUAL
       const result: PresupuestoPorProducto[] = [];
-
+      
       items.forEach((it) => {
         const productoTotal = it.product.precio * it.qty;
         const opciones: PresupuestoItem[] = [];
 
         selectedMethods.forEach((m) => {
+          console.log("Calculando método:", m.metodo);
           let garantiasExtra = 0;
           GARANTIAS.forEach((g) => {
             if (garantias[g.id]) garantiasExtra += productoTotal * g.porcentaje;
           });
 
           const totalBase = productoTotal + garantiasExtra;
-          const totalFinal = totalBase * (1 + m.recargo);
+          const totalFinal = m.metodo == "tarjeta" ? totalBase * (1 + m.recargo) : totalBase * (1 - m.recargo);
 
           opciones.push({
             nombre: m.name,
@@ -148,9 +150,10 @@ const CartPage: React.FC = () => {
 
         const mapped = payments.map((p: any) => ({
           id: String(p.id),
-          name: p.description || p.method,
+          name: p.description,
           cuotas: Number(p.installments) || 1,
           recargo: Number(p.amount) || 0,
+          metodo : p.method,
         }));
         setAvailableMethods(mapped);
       } catch (err) {

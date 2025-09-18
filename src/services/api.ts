@@ -266,25 +266,21 @@ export const budgetService = {
     return apiRequest('POST', API_CONFIG.ENDPOINTS.BUDGETS.CREATE, budgetData);
   },
 
-  getBudgets: async (params?: { page?: number; pageSize?: number }) => {
-    return apiRequest('GET', API_CONFIG.ENDPOINTS.BUDGETS.LIST, undefined, { params });
+  getBudgets: async (filters?: { vendedor?: string; dateFrom?: string; dateTo?: string; rubro?: string }) => {
+    return apiRequest('GET', API_CONFIG.ENDPOINTS.BUDGETS.LIST, undefined, { params: filters });
   },
 
   getBudget: async (id: string) => {
     return apiRequest('GET', API_CONFIG.ENDPOINTS.BUDGETS.DETAIL(id));
   },
 
-  sendBudget: async (id: string) => {
-    return apiRequest('POST', API_CONFIG.ENDPOINTS.BUDGETS.SEND(id));
+  updateBudget: async (id: string, data: any) => {
+    return apiRequest('PUT', API_CONFIG.ENDPOINTS.BUDGETS.UPDATE(id), data);
   },
 
-  acceptBudget: async (id: string) => {
-    return apiRequest('POST', API_CONFIG.ENDPOINTS.BUDGETS.ACCEPT(id));
-  },
-
-  rejectBudget: async (id: string) => {
-    return apiRequest('POST', API_CONFIG.ENDPOINTS.BUDGETS.REJECT(id));
-  },
+  deleteBudget: async (id: string) => {
+    return apiRequest('DELETE', API_CONFIG.ENDPOINTS.BUDGETS.DELETE(id));
+  }
 };
 
 export const sellerService = {
