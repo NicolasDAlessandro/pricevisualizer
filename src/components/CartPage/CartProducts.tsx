@@ -1,5 +1,6 @@
 import React from "react";
 import { useCart } from "../../context/CartContext";   
+import { formatCurrency } from "../../utils/formatCurrency";
 
 const CartProducts: React.FC = () => {
   const { items, setQty, remove } = useCart();
@@ -31,7 +32,7 @@ const CartProducts: React.FC = () => {
           >
             <td className="py-2 border border-black">{it.product.detalle}</td>
             <td className="py-2 border border-black">
-              ${it.product.precio.toFixed(2)}
+              ${formatCurrency(it.product.precio)}
             </td>
             <td className="py-2 border border-black-700">
               <input
@@ -45,7 +46,7 @@ const CartProducts: React.FC = () => {
               />
             </td>
             <td className="py-2 border border-black">
-              ${(it.product.precio * it.qty).toFixed(2)}
+              ${formatCurrency(it.product.precio * it.qty)}
             </td>
             <td className="py-2 border border-black">
               <button

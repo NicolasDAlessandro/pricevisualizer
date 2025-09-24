@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { paymentService } from "../services/api";
+import { formatCurrency } from "../utils/formatCurrency";
 
 export type PaymentMethod = {
   id: string;
@@ -78,10 +79,10 @@ const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
                   <td className="px-3 py-2 border border-gray-600">{method.name}</td>
                   <td className="px-3 py-2 border border-gray-600">{method.cuotas}</td>
                   <td className="px-3 py-2 border border-gray-600 text-blue-400">
-                    ${cuota.toFixed(2)}
+                    ${formatCurrency(cuota)}
                   </td>
                   <td className="px-3 py-2 border border-gray-600 text-green-400">
-                    ${total.toFixed(2)}
+                    ${formatCurrency(total)}
                   </td>
                 </tr>
               );

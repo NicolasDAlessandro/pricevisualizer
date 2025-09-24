@@ -6,6 +6,8 @@ import whatsappIcon from "../assets/whatsapp.png";
 import locationIcon from "../assets/local.png";
 import web from "../assets/web.png";
 
+import { formatCurrency } from "../utils/formatCurrency";
+
 export type PresupuestoItem = {
   nombre: string;
   cuotas: number;
@@ -25,7 +27,9 @@ export type PresupuestoPorProducto = {
 export const generarPDF = async (
   items: ProductoItem[],
   presupuesto: PresupuestoItem[] | PresupuestoPorProducto[],
-  seller?: { nombre: string; apellido: string; numeroVendedor: number }
+  seller?: { nombre: string; apellido: string;},
+  cliente?: string,
+  observaciones?: string
 ) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
@@ -40,16 +44,22 @@ export const generarPDF = async (
   doc.line(0, 42, pageWidth, 42);
 
   // --- Fecha debajo del logo
-  const fecha = new Date().toLocaleDateString();
+  const fecha = new Date().toLocaleDateString("es-AR");
   doc.setFontSize(10);
-  doc.text(`${fecha}`, pageWidth - 14, 50, { align: "right" });
+  doc.text(`${fecha} - Válido por 7 días`, pageWidth - 14, 50, { align: "right" });
+  
+  // --- Vendedor
   if (seller) {
     doc.setFontSize(10);
     doc.text(
-      `Vendedor: ${seller.nombre} ${seller.apellido} N° ${seller.numeroVendedor}`,
+      `Vendedor: ${seller.nombre} ${seller.apellido} `,
       14,
       50
     );
+  }
+  // --- Cliente
+   if (cliente) {
+    doc.text(`Cliente: ${cliente}`, 14, 57);
   }
 
   // --- Título centrado
@@ -59,13 +69,11 @@ export const generarPDF = async (
   // --- Tabla de productos
   const productRows = items.map((it) => [
     it.detalle,
-    `$${it.precio.toFixed(2)}`,
     it.qty,
-    `$${(it.precio * it.qty).toFixed(2)}`,
   ]);
 
   autoTable(doc, {
-    head: [["Producto", "Precio", "Cantidad", "Subtotal"]],
+    head: [["Producto", "Cantidad"]],
     body: productRows,
     startY: 70,
     theme: "grid",
@@ -85,6 +93,7 @@ export const generarPDF = async (
     },
   });
 
+
   // Detectar tipo de presupuesto
   const esIndividual = (presupuesto as PresupuestoPorProducto[])[0]?.opciones !== undefined;
 
@@ -93,8 +102,8 @@ export const generarPDF = async (
     const paymentRows = (presupuesto as PresupuestoItem[]).map((p) => [
       p.nombre,
       p.cuotas,
-      `$${p.montoCuota.toFixed(2)}`,
-      `$${p.total.toFixed(2)}`,
+      `$${formatCurrency(p.montoCuota)}`,
+      `$${formatCurrency(p.total)}`,
     ]);
 
     autoTable(doc, {
@@ -137,8 +146,8 @@ export const generarPDF = async (
       const paymentRows = grupo.opciones.map((p) => [
         p.nombre,
         p.cuotas,
-        `$${p.montoCuota.toFixed(2)}`,
-        `$${p.total.toFixed(2)}`,
+        `$${formatCurrency(p.montoCuota)}`,
+        `$${formatCurrency(p.total)}`,
       ]);
 
       autoTable(doc, {
@@ -162,6 +171,15 @@ export const generarPDF = async (
         },
       });
     });
+  }
+  // --- Observaciones
+  
+  if (observaciones) {
+    let lastY = (doc as any).lastAutoTable ? (doc as any).lastAutoTable.finalY + 15 : pageHeight - 40;
+    doc.setFontSize(11);
+    doc.text("Observaciones:", 14, lastY);
+    doc.setFontSize(10);
+    doc.text(observaciones, 14, lastY + 6);
   }
 
   // --- FOOTER

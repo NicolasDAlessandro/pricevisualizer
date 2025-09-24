@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { productService } from "../services/api";
+import { formatCurrency } from "../utils/formatCurrency";
 import type { ProductDto } from "../types/Api.php";
+
+
 import SearchBar from "./SearchBar";
 import PaymentOptions from "./PaymentOptions";
 import Toast from "./Toast";
@@ -138,7 +141,7 @@ const ProductTable: React.FC = () => {
                     <td className="px-6 py-4">{prod.stock_centro ?? 0}</td>
                     <td className="px-6 py-4">{prod.stock_deposito ?? 0}</td>
                     <td className="px-6 py-4 text-blue-400">
-                      ${prod.price.toFixed(2)}
+                      ${formatCurrency(prod.price)}
                     </td>
                     <td className="px-6 py-4">
                       <button
