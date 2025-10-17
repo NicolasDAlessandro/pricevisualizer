@@ -1,4 +1,4 @@
-// CartPage/PresupuestoTable.tsx
+
 import React from "react";
 import type { PresupuestoItem } from "./useBudget";
 import { formatCurrency } from "../../utils/formatCurrency";

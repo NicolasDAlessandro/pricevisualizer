@@ -14,8 +14,7 @@ if ($method === 'GET' && $path === '/api/budgets') {
     $budgets = $budgetModel->getAll($filters);
     echo json_encode(["success" => true, "data" => $budgets]);
 }
-
-// CREAR
+// CREAR PRESUPUESTO
 elseif ($method === 'POST' && $path === '/api/budgets') {
     $user = verifyAuth($pdo);
     $data = json_decode(file_get_contents('php://input'), true);
@@ -23,27 +22,24 @@ elseif ($method === 'POST' && $path === '/api/budgets') {
     $id = $budgetModel->create($data);
     echo json_encode(["success" => true, "data" => ["id" => $id]]);
 }
-
-// DETALLE
+// DETALLE DE PRESUPUESTO
 elseif ($method === 'GET' && preg_match('#^/api/budgets/(\d+)$#', $path, $m)) {
     $budget = $budgetModel->getById($m[1]);
     echo $budget ? json_encode(["success" => true, "data" => $budget])
                  : json_encode(["success" => false, "message" => "Not found"]);
 }
-
-// UPDATE
-elseif ($method === 'PUT' && preg_match('#^/api/budgets/(\d+)$#', $path, $m)) {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $budgetModel->update($m[1], $data);
-    echo json_encode(["success" => true, "data" => ["message" => "Updated"]]);
-}
-
-// DELETE
+// ELIMINAR PRESUPUESTO
 elseif ($method === 'DELETE' && preg_match('#^/api/budgets/(\d+)$#', $path, $m)) {
     $budgetModel->delete($m[1]);
     echo json_encode(["success" => true, "data" => ["message" => "Deleted"]]);
 }
-
+// ESTADÍSTICAS
+elseif ($method === 'GET' && $path === '/api/budgets/stats') {
+    $user = verifyAuth($pdo);
+    $filters = $_GET; 
+    $stats = $budgetModel->getStats($filters);
+    echo json_encode(["success" => true, "data" => $stats]);
+}
 else {
     http_response_code(404);
     echo json_encode(["success" => false, "message" => "Endpoint no encontrado"]);

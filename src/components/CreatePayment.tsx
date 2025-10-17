@@ -42,7 +42,7 @@ const CreatePayment: React.FC = () => {
       return;
     }
 
-    if (payment.amount <= 0) {
+    if (payment.amount < 0) {
       setError("Ingrese un monto válido");
       return;
     }
@@ -95,7 +95,6 @@ const CreatePayment: React.FC = () => {
             value={payment.amount}
             onChange={handleChange}
             className="block w-full p-2 border border-gray-600 bg-gray-900 text-gray-200 rounded-md focus:ring-2 focus:ring-blue-500"
-            required
             min="0"
             step="0.01"
           />

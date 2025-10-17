@@ -1,19 +1,31 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Navigate, useLocation } from "react-router-dom";
 
-type Props = {
-  children: React.ReactNode;
+interface Props {
   roles?: string[];
-};
+  children: React.ReactNode;
+}
 
-const ProtectedRoute: React.FC<Props> = ({ children, roles }) => {
-  const { user, isAuthenticated } = useAuth();
+const ProtectedRoute: React.FC<Props> = ({ roles, children }) => {
+  const token = localStorage.getItem("authToken");
+  const user = localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")!)
+    : null;
 
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  if (roles && user && !roles.includes(user.role)) return <Navigate to="/" replace />;
+  const location = useLocation();
 
-  return children;
+  // No autenticado, redirige a login
+  if (!token || !user) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  //  Usuario autenticado pero sin rol permitido
+  if (roles && !roles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
+
+  //  Autenticado y con rol válido, permite acceso
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

@@ -1,18 +1,8 @@
 <?php
-require_once(__DIR__ . "/../config/db.php");
+require_once __DIR__ . '/../config/db.php';
 
-try {
-    $stmt = $pdo->query("SELECT NOW() as fecha");
-    $row = $stmt->fetch();
-    echo json_encode([
-        "success" => true,
-        "message" => "Conexión exitosa a la DB",
-        "fecha" => $row["fecha"]
-    ]);
-} catch (Exception $e) {
-    echo json_encode([
-        "success" => false,
-        "message" => "Error al ejecutar test",
-        "error" => $e->getMessage()
-    ]);
-}
+$stmt = $pdo->prepare("INSERT INTO payments (user_id, amount, method, installments, description, status, created_at, updated_at)
+                       VALUES (1, 99.99, 'test', 1, 'Pago de prueba', 1, NOW(), NOW())");
+$stmt->execute();
+
+echo json_encode(["success" => true, "id" => $pdo->lastInsertId()]);

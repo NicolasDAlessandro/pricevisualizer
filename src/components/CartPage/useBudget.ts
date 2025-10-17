@@ -2,8 +2,6 @@
 import { useMemo } from "react";
 import type { PaymentMethod } from "../PaymentOptions";
 
-export type ManualPayment = { nombre: string; cuotas: number; monto: number };
-
 export type PresupuestoItem = {
   nombre: string;
   cuotas: number;
@@ -30,7 +28,7 @@ interface UsePresupuestoProps {
   items: any[];
   garantias: Record<string, boolean>;
   selectedMethods: PaymentMethod[];
-  manualList: ManualPayment[];
+  entrega?: number;
 }
 
 const usePresupuesto = ({
@@ -39,9 +37,12 @@ const usePresupuesto = ({
   items,
   garantias,
   selectedMethods,
-  manualList,
+  entrega = 0,
 }: UsePresupuestoProps) => {
   return useMemo(() => {
+    if (items.length === 0) {
+      return []; 
+    }
     if (!modoIndividual) {
       // --- MODO TOTAL
       const result: PresupuestoItem[] = [];
@@ -54,7 +55,7 @@ const usePresupuesto = ({
           if (garantias[g.id]) garantiasExtra += base * g.porcentaje;
         });
 
-        const totalBase = base + garantiasExtra;
+        const totalBase = base + garantiasExtra - entrega;
         const totalFinal = m.metodo === "tarjeta" ? totalBase * (1 + m.recargo) : totalBase * (1 - m.recargo);
 
         result.push({
@@ -65,14 +66,7 @@ const usePresupuesto = ({
         });
       });
 
-      manualList.forEach((m) => {
-        result.push({
-          nombre: m.nombre,
-          cuotas: m.cuotas,
-          montoCuota: m.monto,
-          total: m.monto * m.cuotas,
-        });
-      });
+
 
       return result;
     } else {
@@ -83,13 +77,14 @@ const usePresupuesto = ({
         const productoTotal = it.product.precio * it.qty;
         const opciones: PresupuestoItem[] = [];
 
+        
         selectedMethods.forEach((m) => {
           let garantiasExtra = 0;
           GARANTIAS.forEach((g) => {
             if (garantias[g.id]) garantiasExtra += productoTotal * g.porcentaje;
           });
 
-          const totalBase = productoTotal + garantiasExtra;
+          const totalBase = productoTotal + garantiasExtra - entrega;
           const totalFinal = m.metodo === "tarjeta" ? totalBase * (1 + m.recargo) : totalBase * (1 - m.recargo);
 
           opciones.push({
@@ -100,21 +95,14 @@ const usePresupuesto = ({
           });
         });
 
-        manualList.forEach((m) =>
-          opciones.push({
-            nombre: m.nombre,
-            cuotas: m.cuotas,
-            montoCuota: m.monto,
-            total: m.monto * m.cuotas,
-          })
-        );
+
 
         result.push({ producto: it.product.detalle, opciones });
       });
 
       return result;
     }
-  }, [modoIndividual, subtotal, garantias, selectedMethods, manualList, items]);
+  }, [modoIndividual, subtotal, garantias, selectedMethods, items]);
 };
 
 export default usePresupuesto;

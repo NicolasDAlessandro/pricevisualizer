@@ -7,7 +7,7 @@ interface Seller {
   id: number;
   nombre: string;
   apellido: string;
-  numeroVendedor: number;
+  numero_vendedor: number;
   activo: boolean;
 }
 

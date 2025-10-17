@@ -7,21 +7,29 @@ class User {
     }
 
     public function create($userData) {
-        $sql = "INSERT INTO users (username, email, password, first_name, last_name, role) 
-                VALUES (:username, :email, :password, :first_name, :last_name, :role)";
-        
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':username' => $userData['username'],
-            ':email' => $userData['email'],
-            ':password' => password_hash($userData['password'], PASSWORD_BCRYPT),
-            ':first_name' => $userData['firstName'],
-            ':last_name' => $userData['lastName'],
-            ':role' => $userData['role']
-        ]);
-        
-        return $this->pdo->lastInsertId();
+        try {
+            $sql = "INSERT INTO users 
+                (username, email, password, first_name, last_name, role, created_at, updated_at) 
+                VALUES (:username, :email, :password, :first_name, :last_name, :role, NOW(), NOW())";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':username' => $userData['username'],
+                ':email' => $userData['email'],
+                ':password' => password_hash($userData['password'], PASSWORD_BCRYPT),
+                ':first_name' => $userData['firstName'],
+                ':last_name' => $userData['lastName'],
+                ':role' => $userData['role']
+            ]);
+
+            return $this->pdo->lastInsertId();
+        } catch (PDOException $e) {
+            error_log(" Error en User::create -> " . $e->getMessage());
+            throw $e; 
+        }
     }
+
+
 
     public function findByUsername($username) {
         $sql = "SELECT * FROM users WHERE username = :username";
@@ -48,13 +56,14 @@ class User {
     }
 
     public function saveToken($userId, $token) {
-        $sql = "UPDATE users SET auth_token = ? WHERE id = ?";
+        $expiresAt = date('Y-m-d H:i:s', strtotime('+4 hour'));
+        $sql = "UPDATE users SET auth_token = ?, token_expires_at = ? WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([$token, $userId]);
+        return $stmt->execute([$token, $expiresAt, $userId]);
     }
 
     public function findByToken($token) {
-        $sql = "SELECT id, username, email, first_name, last_name, role FROM users WHERE auth_token = ? LIMIT 1";
+        $sql = "SELECT * FROM users WHERE auth_token = ? AND token_expires_at > NOW() LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([$token]);
         return $stmt->fetch();

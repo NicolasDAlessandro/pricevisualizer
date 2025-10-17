@@ -24,7 +24,7 @@ if (strpos($path, '/api/auth') === 0) {
 } elseif (strpos($path, '/api/payments') === 0) {
     require_once 'routes/payments.php';
 } elseif (strpos($path, '/api/budgets') === 0) {
-    require_once 'routes/budgets.php';
+    require_once 'routes/budget.php';
 } elseif (strpos($path, '/api/sellers') === 0) {
     require_once 'routes/seller.php';
 } elseif (strpos($path, '/api/test') === 0) {

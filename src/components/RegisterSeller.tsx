@@ -5,14 +5,14 @@ interface Seller {
   id?: number;
   nombre: string;
   apellido: string;
-  numeroVendedor: number;
+  numero_vendedor: number;
   activo?: boolean;
 }
 
 const RegisterSeller: React.FC = () => {
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
-  const [numeroVendedor, setNumeroVendedor] = useState<number | "">("");
+  const [numero_vendedor, setNumeroVendedor] = useState<number | "">("");
   const [sellers, setSellers] = useState<Seller[]>([]);
 
   useEffect(() => {
@@ -21,13 +21,14 @@ const RegisterSeller: React.FC = () => {
 
   const loadSellers = async () => {
     const sellers = await sellerService.getAll();
+    
     setSellers(sellers);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!nombre || !apellido || numeroVendedor === "") {
+    if (!nombre || !apellido || numero_vendedor === "") {
       alert("Todos los campos son obligatorios");
       return;
     }
@@ -35,7 +36,7 @@ const RegisterSeller: React.FC = () => {
     const newSeller: Seller = {
       nombre,
       apellido,
-      numeroVendedor: Number(numeroVendedor),
+      numero_vendedor,
       activo: true,
     };
 
@@ -91,7 +92,7 @@ const RegisterSeller: React.FC = () => {
           <input
             type="number"
             id="numeroVendedor"
-            value={numeroVendedor}
+            value={numero_vendedor}
             onChange={(e) =>
               setNumeroVendedor(e.target.value ? Number(e.target.value) : "")
             }
@@ -131,7 +132,7 @@ const RegisterSeller: React.FC = () => {
                       : "bg-gray-700 border-b border-gray-600"
                   }`}
                 >
-                  <td className="px-4 py-2 text-center">{s.numeroVendedor}</td>
+                  <td className="px-4 py-2 text-center">{s.numero_vendedor}</td>
                   <td className="px-4 py-2">{s.nombre}</td>
                   <td className="px-4 py-2">{s.apellido}</td>
                   <td className="px-4 py-2 text-center">

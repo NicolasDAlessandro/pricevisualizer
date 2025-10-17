@@ -60,7 +60,8 @@ const ProductUploader: React.FC = () => {
         }
 
         const resp = await productService.bulkUpload(products);
-        alert(`Se cargaron/actualizaron ${resp.successCount} productos. Errores: ${resp.errorCount}`);
+ 
+        alert(`Se cargaron/actualizaron ${resp.data.successCount} productos. Errores: ${resp.data.errorCount}`);
       } catch (error) {
         console.error(error);
         alert("Error al procesar el archivo Excel. Verifica el formato y los datos.");

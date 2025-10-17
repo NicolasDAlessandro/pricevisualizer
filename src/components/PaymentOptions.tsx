@@ -6,15 +6,15 @@ export type PaymentMethod = {
   id: string;
   name: string;
   cuotas: number;
-  recargo: number; // (0.1 = 10%)
+  recargo: number; // 0.1 = 10%
   metodo: string;
 };
 
-type PaymentMethodsListProps = {
+type PaymentOptionsProps = {
   price: number;
 };
 
-const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
+const PaymentOptions: React.FC<PaymentOptionsProps> = ({ price }) => {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -24,14 +24,13 @@ const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
       try {
         const payments = await paymentService.getPayments();
 
-        const mapped = payments.map((p: any) => ({
+        const mapped: PaymentMethod[] = payments.map((p: any) => ({
           id: String(p.id),
-          name: p.description, 
+          name: p.description,
           cuotas: Number(p.installments) || 1,
-          recargo: p.amount, 
-          metodo : p.method,
+          recargo: Number(p.amount), // ya viene como 0.03 si es 3%
+          metodo: p.method,
         }));
-
 
         setMethods(mapped);
       } catch (err: any) {
@@ -42,20 +41,19 @@ const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
     };
 
     loadMethods();
-  }, []);
+  }, [price]);
 
   if (loading) {
-    return <p className="text-center text-gray-600">Cargando métodos de pago...</p>;
+    return <p className="text-center text-gray-400">Cargando métodos de pago...</p>;
   }
 
   if (error) {
-    return <p className="text-center text-red-600">{error}</p>;
+    return <p className="text-center text-red-500">{error}</p>;
   }
 
   return (
     <div className="overflow-x-auto">
-      {/*  Tabla scrolleable verticalmente */}
-      <div className="max-h-72 overflow-y-auto border border-gray-700 rounded shadow-sm bg-gray-800">
+      <div className="max-h-72 overflow-y-auto border border-gray-700 rounded-lg shadow bg-gray-800">
         <table className="w-full text-sm text-gray-300 border-collapse">
           <thead className="sticky top-0 bg-blue-700 text-white uppercase text-xs">
             <tr className="text-center">
@@ -67,21 +65,24 @@ const PaymentOptions: React.FC<PaymentMethodsListProps> = ({ price }) => {
           </thead>
           <tbody className="text-center">
             {methods.map((method) => {
+              const esTarjeta = method.metodo.toLowerCase() !== "efectivo";
+              const total = esTarjeta
+                ? price * (1 + method.recargo)
+                : price * (1 - method.recargo);
 
-              const total = method.metodo == "tarjeta" ? price * (1 + method.recargo): price * (1 - method.recargo);
               const cuota = total / method.cuotas;
 
               return (
                 <tr
                   key={method.id}
-                  className="hover:bg-gray-700 transition border-b border-gray-700"
+                  className="hover:bg-gray-700 transition-colors border-b border-gray-700"
                 >
                   <td className="px-3 py-2 border border-gray-600">{method.name}</td>
                   <td className="px-3 py-2 border border-gray-600">{method.cuotas}</td>
-                  <td className="px-3 py-2 border border-gray-600 text-blue-400">
+                  <td className="px-3 py-2 border border-gray-600 text-blue-400 font-semibold">
                     ${formatCurrency(cuota)}
                   </td>
-                  <td className="px-3 py-2 border border-gray-600 text-green-400">
+                  <td className="px-3 py-2 border border-gray-600 text-green-400 font-semibold">
                     ${formatCurrency(total)}
                   </td>
                 </tr>

@@ -1,119 +1,85 @@
 <?php
-require_once __DIR__ . "/../config/db.php";
-require_once __DIR__ . "/../config/cors.php";
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../models/Payments.php';
+require_once __DIR__ . '/../middleware/auth.php';
 
 header('Content-Type: application/json');
 
-// Obtener método y ruta
+$paymentModel = new Payment($pdo);
 $method = $_SERVER['REQUEST_METHOD'];
-$path   = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$path   = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), "/"); 
 
-// Extraer la parte de la ruta después de /api/payments
-$basePath = "/api/payments";
-$subPath = substr($path, strlen($basePath));
- 
 try {
-    // Crear un nuevo pago
-    if ($method === "POST" && $subPath === "") {
-        
-        $input = json_decode(file_get_contents("php://input"), true);
+    // CREAR PAGO
+    if ($method === "POST" && $path === "/api/payments") {
+        $user = verifyAuth($pdo);
 
-        $amount       = $input["amount"] ?? 0;
-        $methodPay    = $input["method"] ?? "";
-        $installments = $input["installments"] ?? 1;
-        $description  = $input["description"] ?? "";
-        $userId       = $input["user_id"] ?? 1; 
-        $status       = "pending";
-
-        if ($amount <= 0 || empty($methodPay)) {
-            http_response_code(400);
-            echo json_encode(["success" => false, "message" => "Faltan datos obligatorios"]);
+        if ($user['role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(["success" => false, "message" => "Solo el admin puede registrar pagos"]);
             exit;
         }
 
-        $stmt = $pdo->prepare("
-            INSERT INTO payments (user_id, amount, method, installments, description, status, created_at, updated_at)
-            VALUES (:user_id, :amount, :method, :installments, :description, :status, NOW(), NOW())
-        ");
-        $stmt->execute([
-            ":user_id"      => $userId,
-            ":amount"       => $amount,
-            ":method"       => $methodPay,
-            ":installments" => $installments,
-            ":description"  => $description,
-            ":status"       => $status
-        ]);
-
-        echo json_encode([
-            "success"    => true,
-            "message"    => "Pago creado correctamente",
-            "payment_id" => $pdo->lastInsertId()
-        ]);
-        exit;
-    }
-    // Listar todos los pagos
-    if ($method === "GET" && $subPath === "") {
-        
-        $stmt = $pdo->query("SELECT * FROM payments WHERE status = 1 ORDER BY description ASC");
-        $payments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        echo json_encode([
-            "success" => true,
-            "data"    => $payments
-        ]);
-        exit;
-    }
-    
-    if ($method === "PUT" && preg_match("#^/([0-9]+)$#", $subPath, $matches)) {
-        $id = (int)$matches[1];
         $input = json_decode(file_get_contents("php://input"), true);
 
-        $fields = [];
-        $params = [":id" => $id];
-
-        if (isset($input["status"])) {
-            $fields[] = "status = :status";
-            $params[":status"] = $input["status"];
-        }
-        if (isset($input["amount"])) {
-            $fields[] = "amount = :amount";
-            $params[":amount"] = $input["amount"];
-        }
-        if (isset($input["method"])) {
-            $fields[] = "method = :method";
-            $params[":method"] = $input["method"];
-        }
-        if (isset($input["installments"])) {
-            $fields[] = "installments = :installments";
-            $params[":installments"] = $input["installments"];
-        }
-        if (isset($input["description"])) {
-            $fields[] = "description = :description";
-            $params[":description"] = $input["description"];
-        }
-
-        if (empty($fields)) {
+        if (!isset($input['method']) || trim($input['method']) === "") {
             http_response_code(400);
-            echo json_encode(["success" => false, "message" => "No se enviaron campos para actualizar"]);
+            echo json_encode(["success" => false, "message" => "El campo 'method' es obligatorio"]);
             exit;
         }
 
-        $sql = "UPDATE payments SET " . implode(", ", $fields) . ", updated_at = NOW() WHERE id = :id";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($params);
+        if (!isset($input['amount']) || !is_numeric($input['amount']) || $input['amount'] < 0) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "El campo 'amount' debe ser un número válido"]);
+            exit;
+        }
 
-        echo json_encode([
-            "success" => true,
-            "message" => "Pago actualizado correctamente"
-        ]);
+        $input['user_id'] = $user['id'];
+        $input['installments'] = $input['installments'] ?? 1;
+        $input['description'] = !empty($input['description']) ? $input['description'] : null;
+
+        $payment = $paymentModel->create($input);
+
+        echo json_encode(["success" => true, "data" => $payment]);
         exit;
     }
 
+    // LISTAR PAGOS
+    if ($method === "GET" && $path === "/api/payments") {
+        $user = verifyAuth($pdo);
+        $payments = $paymentModel->getAll();
+        echo json_encode(["success" => true, "data" => $payments]);
+        exit;
+    }
+
+    // ACTUALIZAR
+    if ($method === "PUT" && preg_match('#^/api/payments/(\d+)$#', $path, $matches)) {
+        $user = verifyAuth($pdo);
+
+        if ($user['role'] !== 'admin') {
+            http_response_code(403);
+            echo json_encode(["success" => false, "message" => "No tienes permiso para actualizar pagos"]);
+            exit;
+        }
+
+        $id = (int) $matches[1];
+        $input = json_decode(file_get_contents("php://input"), true);
+
+        if (empty($input)) {
+            http_response_code(400);
+            echo json_encode(["success" => false, "message" => "No se enviaron datos para actualizar"]);
+            exit;
+        }
+
+        $paymentModel->update($id, $input);
+        echo json_encode(["success" => true, "message" => "Pago actualizado correctamente"]);
+        exit;
+    }
 
     http_response_code(404);
     echo json_encode(["success" => false, "message" => "Ruta no encontrada"]);
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(["success" => false, "message" => "Error: " . $e->getMessage()]);
+    echo json_encode(["success" => false, "message" => "Error interno: " . $e->getMessage()]);
 }

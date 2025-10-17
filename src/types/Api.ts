@@ -13,8 +13,10 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  token: string;
-  user: UserDto;
+  data: {
+      token: string;
+      user: UserDto;
+  }
 }
 
 export interface CreateUserDto {
@@ -36,7 +38,7 @@ export interface UserDto {
 }
 
 export interface ProductDto {
-  id?: Number;
+  id?: number;
   name: string;
   description?: string;
   price: number;
@@ -48,8 +50,6 @@ export interface ProductDto {
   sellerName?: string;
   updatedAt?: string;
 }
-
-
 
 export interface CreateProductDto {
   name: string;
@@ -81,22 +81,26 @@ export interface PaymentDto {
 }
 
 
+export interface BudgetItemDto {
+    productoId: number;
+    cantidad: number;
+  }
 
-export interface BudgetDto {
-  id: string;
-  userId: string;
-  totalAmount: number;
-  status: "draft" | "sent" | "accepted" | "rejected";
-  items: CartItemDto[];
-  createdAt: string;
-  updatedAt: string;
+export interface CreateBudgetDto {
+  vendedorId: number;
+  userId?: number; 
+  payments: number[]; 
+  items: {
+    productoId: number;
+    cantidad: number;
+  }[];
 }
 
 export type SellerDto = {
   id: number;
   nombre: string;
   apellido: string;
-  numeroVendedor: number;
+  numero_vendedor: number;
   activo: boolean;
   createdAt: string;
 };
@@ -109,9 +113,9 @@ export const API_CONFIG = {
     AUTH: {
       LOGIN: "/auth/login",
       REGISTER: "/auth/register",
-      REFRESH: "/auth/refresh",
+      PROFILE: "/auth/profile",
       LOGOUT: "/auth/logout",
-      PROFILE: "/auth/profile"
+      REFRESH: "/auth/refresh"
     },
     PRODUCTS: {
       LIST: "/products",
@@ -143,7 +147,8 @@ export const API_CONFIG = {
       UPDATE: (id: string) => `/budgets/${id}`,  
       DELETE: (id: string) => `/budgets/${id}`,   
       ACCEPT: (id: string) => `/budgets/${id}/accept`,
-      REJECT: (id: string) => `/budgets/${id}/reject`
+      REJECT: (id: string) => `/budgets/${id}/reject`,
+      STATS: "/budgets/stats",
     },
     USERS: {
       LIST: "/users",

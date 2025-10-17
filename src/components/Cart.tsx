@@ -1,7 +1,7 @@
 // CartPage/index.tsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useCart } from "../context/CartContext";
-import { paymentService } from "../services/api";
+import { paymentService, budgetService } from "../services/api";
 import { generarPDF } from "../utils/pdfGenerator";
 import { formatCurrency } from "../utils/formatCurrency";
 
@@ -9,10 +9,13 @@ import CartProducts from "./CartPage/CartProducts";
 import PaymentSelector from "./CartPage/PaymentSelector";
 import SelectSeller from "./CartPage/SelectSeller";
 import GarantiasSelector from "./CartPage/GarantiaSelector";
-import ManualPaymentForm from "./CartPage/ManualPayment";
+import AdvancePayment from "./CartPage/AdvancePayment";
 import PresupuestoTable from "./CartPage/BudgetTable";
 import PresupuestoPorProductoTable from "./CartPage/BudgetForProduct";
-import usePresupuesto, {type ManualPayment, type PresupuestoItem, type PresupuestoPorProducto } from "./CartPage/useBudget";
+import usePresupuesto, {
+  type PresupuestoItem,
+  type PresupuestoPorProducto,
+} from "./CartPage/useBudget";
 
 import type { PaymentMethod } from "./PaymentOptions";
 
@@ -23,25 +26,25 @@ const CartPage: React.FC = () => {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [modoIndividual, setModoIndividual] = useState(false);
   const [openSellerModal, setOpenSellerModal] = useState(false);
-  const [manualList, setManualList] = useState<ManualPayment[]>([]);
+  const [entrega, setEntrega] = useState(0);
 
-  // selected methods
+  // --- Métodos seleccionados ---
   const selectedMethods = useMemo(
     () => availableMethods.filter((m) => selected[m.id]),
     [availableMethods, selected]
   );
 
-  // presupuesto calculado
+  // --- Calcular presupuesto ---
   const presupuesto = usePresupuesto({
     modoIndividual,
     subtotal,
     items,
     garantias,
     selectedMethods,
-    manualList,
+    entrega,
   });
 
-  // cargar métodos de pago
+  // --- Cargar métodos de pago ---
   useEffect(() => {
     const loadMethods = async () => {
       try {
@@ -61,9 +64,73 @@ const CartPage: React.FC = () => {
     loadMethods();
   }, []);
 
+  const handleGenerateBudget = async ({
+    seller,
+    cliente,
+    observaciones,
+  }: {
+    seller: { id: number; nombre: string; apellido: string };
+    cliente?: string;
+    observaciones?: string;
+  }) => {
+    try {
+      if (items.length === 0) {
+        alert("No hay productos en el presupuesto.");
+        return;
+      }
+
+      if (selectedMethods.length === 0) {
+        alert("Debes seleccionar al menos una forma de pago.");
+        return;
+      }
+
+      const payload = {
+        vendedorId: seller.id,
+        payments: selectedMethods.map((m) => Number(m.id)),
+        items: items.map((it) => {
+          const product = it.product as any;
+          const productoId = Number(product.id ?? product.codigo ?? 0);
+
+          return {
+            productoId,
+            cantidad: it.qty,
+          };
+        }),
+      };
+
+      const resp = await budgetService.createBudget(payload);
+
+      if (!resp.success || !resp.data?.id) {
+        throw new Error("Error al crear el presupuesto en la base de datos.");
+      }
+
+      const presupuestoId = resp.data.id;
+
+      // --- Generar PDF ---
+      await generarPDF(
+        items.map((it) => ({
+          detalle: it.product.detalle,
+          precio: it.product.precio,
+          qty: it.qty,
+        })),
+        presupuesto,
+        { nombre: seller.nombre, apellido: seller.apellido },
+        cliente,
+        observaciones,
+        entrega,
+        presupuestoId
+      );
+    } catch (err) {
+
+      console.error("Error creando presupuesto:", err);
+      alert("Ocurrió un error al generar el presupuesto");
+    }
+  };
+
+
   return (
     <div className="max-w-5xl mx-auto p-4 space-y-6 text-gray-200">
-      {/* Productos */}
+      {/* --- Productos --- */}
       <div className="border border-gray-700 bg-gray-800 rounded p-3 overflow-y-auto max-h-60 shadow">
         {items.length === 0 ? (
           <p className="text-gray-400 text-sm italic">
@@ -74,7 +141,7 @@ const CartPage: React.FC = () => {
         )}
       </div>
 
-      {/* Métodos + Resumen */}
+      {/* --- Métodos + Resumen --- */}
       <div className="grid grid-cols-2 gap-4">
         <PaymentSelector
           availableMethods={availableMethods}
@@ -94,55 +161,51 @@ const CartPage: React.FC = () => {
             </button>
           </div>
           <p className="text-sm">
-            Subtotal: <strong className="text-green-400">${formatCurrency(subtotal)}</strong>
+            Subtotal:{" "}
+            <strong className="text-green-400">
+              ${formatCurrency(subtotal)}
+            </strong>
           </p>
           <p className="text-sm mt-2">
-            Opciones seleccionadas:{" "}
-            <span className="text-blue-400">{selectedMethods.length + manualList.length}</span>
+            Formas de pago seleccionadas:{" "}
+            <span className="text-blue-400">{selectedMethods.length}</span>
           </p>
           <GarantiasSelector garantias={garantias} setGarantias={setGarantias} />
         </div>
       </div>
 
-      {/* Ingreso manual */}
-      <ManualPaymentForm manualList={manualList} setManualList={setManualList} />
+      {/* --- Entrega --- */}
+      <AdvancePayment entrega={entrega} setEntrega={setEntrega} />
 
-      {/* Resumen Final */}
+      {/* --- Tablas de resumen --- */}
       {!modoIndividual && (presupuesto as PresupuestoItem[]).length > 0 && (
         <PresupuestoTable data={presupuesto as PresupuestoItem[]} />
       )}
       {modoIndividual && (presupuesto as PresupuestoPorProducto[]).length > 0 && (
-        <PresupuestoPorProductoTable data={presupuesto as PresupuestoPorProducto[]} />
+        <PresupuestoPorProductoTable
+          data={presupuesto as PresupuestoPorProducto[]}
+        />
       )}
 
-      {/* Generar PDF */}
-      {Array.isArray(presupuesto) && presupuesto.length > 0 && (
-        <div className="flex justify-end mt-4">
-          <button
-            onClick={() => setOpenSellerModal(true)}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 shadow transition"
-          >
-            Generar PDF
-          </button>
-        </div>
-      )}
+      {/* --- Botón generar PDF --- */}
+      {items.length > 0 &&
+        Array.isArray(presupuesto) &&
+        presupuesto.length > 0 && (
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={() => setOpenSellerModal(true)}
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 shadow transition"
+            >
+              Generar PDF
+            </button>
+          </div>
+        )}
 
+      {/* --- Modal seleccionar vendedor --- */}
       <SelectSeller
         open={openSellerModal}
         onClose={() => setOpenSellerModal(false)}
-        onSelect={({ seller, cliente, observaciones }) => {
-          generarPDF(
-            items.map((it) => ({
-              detalle: it.product.detalle,
-              precio: it.product.precio,
-              qty: it.qty,
-            })),
-            presupuesto,
-            { nombre: seller.nombre, apellido: seller.apellido },
-            cliente,
-            observaciones
-          );
-        }}
+        onSelect={handleGenerateBudget}
       />
     </div>
   );

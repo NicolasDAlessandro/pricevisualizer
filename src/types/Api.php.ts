@@ -61,13 +61,6 @@ export interface CreateProductDto {
 
 export interface UpdateProductDto extends Partial<CreateProductDto> {}
 
-export interface CartItemDto {
-  id?: string;
-  productId: string;
-  quantity: number;
-  product: ProductDto;
-}
-
 export interface PaymentDto {
   id: string;
   amount: number;
@@ -75,6 +68,13 @@ export interface PaymentDto {
   status: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface CartItemDto {
+  id?: string;
+  productId: string;
+  quantity: number;
+  product: ProductDto;
 }
 
 export interface BudgetDto {

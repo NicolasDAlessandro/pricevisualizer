@@ -29,7 +29,9 @@ export const generarPDF = async (
   presupuesto: PresupuestoItem[] | PresupuestoPorProducto[],
   seller?: { nombre: string; apellido: string;},
   cliente?: string,
-  observaciones?: string
+  observaciones?: string,
+  entrega?: number, 
+  presupuestoId?: number
 ) => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.width;
@@ -57,9 +59,25 @@ export const generarPDF = async (
       50
     );
   }
+
+    // --- Entrega
+  if (typeof entrega === "number" && entrega > 0) {
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(
+      `Entrega : $${entrega.toLocaleString("es-AR", {
+        minimumFractionDigits: 2,
+      })}`,
+      pageWidth - 14,
+      57,
+      { align: "right" }
+    );
+    doc.setTextColor(0, 0, 0); 
+  }
+
   // --- Cliente
    if (cliente) {
-    doc.text(`Cliente: ${cliente}`, 14, 57);
+    doc.text(`Hola: ${cliente}`, 14, 57);
   }
 
   // --- Título centrado
@@ -71,6 +89,8 @@ export const generarPDF = async (
     it.detalle,
     it.qty,
   ]);
+
+
 
   autoTable(doc, {
     head: [["Producto", "Cantidad"]],
@@ -207,5 +227,5 @@ export const generarPDF = async (
   addFooterItem(instagramIcon, "@gaslonihogar", 2);
   addFooterItem(web, "www.gasloni.com.ar", 3);
 
-  doc.save("presupuesto.pdf");
+  doc.save('Presupuesto' + (presupuestoId ? `_${presupuestoId}` : '') + '.pdf');
 };

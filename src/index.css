@@ -3,3 +3,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.recharts-wrapper:focus {
+  outline: none !important;
+}
+
+/* Quita el borde blanco cuando se hace click o focus */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none !important;
+}
+
+/* Elimina el gris en las barras cuando se hace hover o click */
+.recharts-bar-rectangle:hover path,
+.recharts-active-bar path {
+  fill-opacity: 1 !important;
+  fill: currentColor !important;
+}
+
+/* Quita el fondo gris detrás de las barras */
+.recharts-tooltip-cursor {
+  fill: rgba(255, 255, 255, 0.05) !important;
+}
+

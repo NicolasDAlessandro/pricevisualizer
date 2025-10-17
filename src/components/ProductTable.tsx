@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useCart } from "../context/CartContext";
 import { productService } from "../services/api";
 import { formatCurrency } from "../utils/formatCurrency";
-import type { ProductDto } from "../types/Api.php";
+import type { ProductDto } from "../types/Api.ts";
 
 
 import SearchBar from "./SearchBar";
@@ -13,7 +13,7 @@ const ProductTable: React.FC = () => {
   const [allProducts, setAllProducts] = useState<ProductDto[]>([]);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
+  const [expandedRow, setExpandedRow] = useState<number | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +57,7 @@ const ProductTable: React.FC = () => {
 
   const handleAgregar = (product: ProductDto) => {
     add({
-      codigo: parseInt(product.id ?? "0") || 0,
+      codigo: product.id ?? 0,
       detalle: product.name,
       stock: product.stock,
       precio: product.price,
@@ -65,7 +65,7 @@ const ProductTable: React.FC = () => {
     setToastMessage(`Producto "${product.name}" agregado al carrito ✅`);
   };
 
-  const toggleExpand = (id?: string) => {
+  const toggleExpand = (id?: number) => {
     if (!id) return;
     setExpandedRow((prev) => (prev === id ? null : id));
   };

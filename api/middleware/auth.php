@@ -1,4 +1,5 @@
 <?php
+
 function verifyAuth($pdo) {
     $headers = getallheaders();
     $token = isset($headers['Authorization']) ? str_replace('Bearer ', '', $headers['Authorization']) : null;

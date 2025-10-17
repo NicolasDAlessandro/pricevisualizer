@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 require_once __DIR__ . '/../models/Product.php';
-//require_once __DIR__ . '/../middleware/auth.php'; //  Desactivado
+require_once __DIR__ . '/../middleware/auth.php'; 
 
 $productModel = new Product($pdo);
 
@@ -126,9 +126,15 @@ elseif ($method === 'GET' && preg_match('#^/api/products/seller/(\d+)$#', $path,
 }
 
 // CARGA MASIVA DE PRODUCTOS DESDE EXCEL 
-elseif ($method === 'POST' && $path === '/api/products/bulk') {
-    //$user = verifyAuth($pdo); // 
-    
+elseif ($method === 'POST' && $path === '/api/products/bulk') { 
+    $user = verifyAuth($pdo);
+
+    if ($user['role'] !== 'admin') {
+        http_response_code(403);
+        echo json_encode(["success" => false, "message" => "No tienes permiso para cargar productos"]);
+        exit;
+    }
+
     $data = json_decode(file_get_contents('php://input'), true);
 
     if (!isset($data['products']) || !is_array($data['products'])) {
@@ -136,67 +142,64 @@ elseif ($method === 'POST' && $path === '/api/products/bulk') {
         echo json_encode(["success" => false, "message" => "Datos de productos no válidos"]);
         exit;
     }
-    
-    $productModel->deactivateAll();
-    
+
     $products = [];
     $errors = [];
-    
+
     foreach ($data['products'] as $index => $productData) {
-        // Validar campos obligatorios
-        if (empty($productData['name'])) {
-            $errors[] = "Producto $index: Nombre es obligatorio";
+        if (empty($productData['name']) || !isset($productData['price']) || !isset($productData['stock'])) {
+            $errors[] = "Producto $index: faltan campos obligatorios";
             continue;
         }
-        
-        if (!isset($productData['price']) || $productData['price'] === '') {
-            $errors[] = "Producto $index: Precio es obligatorio";
-            continue;
-        }
-        
-        if (!isset($productData['stock']) || $productData['stock'] === '') {
-            $errors[] = "Producto $index: Stock es obligatorio";
-            continue;
-        }
-        
-        // Mapear a estructura de base de datos
+
         $products[] = [
-            'id' => intval($productData['id']),  // 
-            'name' => strval($productData['name']),
-            'description' => strval($productData['description'] ?? $productData['name']),
-            'price' => floatval($productData['price']),
-            'stock' => intval($productData['stock']),
-            'stock_centro' => intval($productData['stock_centro'] ?? 0),
-            'stock_deposito' => intval($productData['stock_deposito'] ?? 0),
-            'category' => strval($productData['category'] ?? 'General'),
-            'imageUrl' => $productData['imageUrl'] ?? null,
-            'sellerId' => 1 // Valor fijo para pruebas
+            'id'            => intval($productData['id']),
+            'name'          => strval($productData['name']),
+            'description'   => strval($productData['description'] ?? $productData['name']),
+            'price'         => floatval($productData['price']),
+            'stock'         => intval($productData['stock']),
+            'stock_centro'  => intval($productData['stock_centro'] ?? 0),
+            'stock_deposito'=> intval($productData['stock_deposito'] ?? 0),
+            'category'      => strval($productData['category'] ?? 'General'),
+            'imageUrl'      => $productData['imageUrl'] ?? null,
+            'sellerId'      => $productData['sellerId'] ?? $user['id']
         ];
     }
-    // Validar que haya productos válidos
+
     if (empty($products)) {
         http_response_code(400);
         echo json_encode([
-            "success" => false, 
+            "success" => false,
             "message" => "No se encontraron productos válidos",
             "errors" => $errors
         ]);
         exit;
     }
-    
-    // Insertar productos en lote
-    $result = $productModel->bulkCreate($products);
-    
-    echo json_encode([
-        "success" => true,
-        "data" => [
-            "message" => "Carga masiva completada",
-            "totalProcessed" => count($products),
-            "successCount" => $result['successCount'],
-            "errorCount" => $result['errorCount'],
-            "errors" => array_merge($errors, $result['errors'])
-        ]
-    ]);
+
+    try {
+       
+        $productModel->deactivateAll();
+
+        $result = $productModel->bulkCreate($products);
+
+        echo json_encode([
+            "success" => true,
+            "data" => [
+                "message"       => "Carga masiva completada",
+                "totalProcessed"=> count($products),
+                "successCount"  => $result['successCount'],
+                "errorCount"    => $result['errorCount'],
+                "errors"        => array_merge($errors, $result['errors'])
+            ]
+        ]);
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode([
+            "success" => false,
+            "message" => "Error en carga masiva",
+            "error"   => $e->getMessage()
+        ]);
+    }
 }
 
 else {

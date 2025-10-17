@@ -72,7 +72,7 @@ const Register: React.FC = () => {
             name="username"
             value={formData.username}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             placeholder="usuario123"
           />
@@ -87,7 +87,7 @@ const Register: React.FC = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             placeholder="usuario@ejemplo.com"
           />
@@ -102,7 +102,7 @@ const Register: React.FC = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             placeholder="••••••••"
           />
@@ -117,7 +117,7 @@ const Register: React.FC = () => {
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             placeholder="Juan"
           />
@@ -132,7 +132,7 @@ const Register: React.FC = () => {
             name="lastName"
             value={formData.lastName}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
             placeholder="Pérez"
           />
@@ -146,7 +146,7 @@ const Register: React.FC = () => {
             name="role"
             value={formData.role}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-gray-700 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="vendedor">Vendedor</option>
             <option value="gerente">Gerente</option>
@@ -163,12 +163,6 @@ const Register: React.FC = () => {
         </button>
       </form>
 
-      <p className="mt-4 text-center text-sm text-gray-600">
-        ¿Ya tienes cuenta?{' '}
-        <a href="/login" className="text-blue-600 hover:text-blue-800">
-          Inicia sesión aquí
-        </a>
-      </p>
     </div>
   );
 };
