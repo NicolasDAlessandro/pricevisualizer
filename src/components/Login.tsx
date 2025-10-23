@@ -52,7 +52,7 @@ const Login: React.FC = () => {
             required
           />
 
-          {/* 👇 Renderizado condicional: si NO hay token, mostramos el botón */}
+          {/*  Renderizado condicional: si NO hay token, mostramos el botón */}
           {!isAuthenticated ? (
             <button
               type="submit"

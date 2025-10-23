@@ -1,4 +1,3 @@
-// CartPage/index.tsx
 import React, { useEffect, useState, useMemo } from "react";
 import { useCart } from "../context/CartContext";
 import { paymentService, budgetService } from "../services/api";
@@ -17,7 +16,13 @@ import usePresupuesto, {
   type PresupuestoPorProducto,
 } from "./CartPage/useBudget";
 
-import type { PaymentMethod } from "./PaymentOptions";
+type PaymentMethod = {
+  id: string;
+  name: string;
+  cuotas: number;
+  recargo: number;
+  metodo: string;
+};
 
 const CartPage: React.FC = () => {
   const { items, subtotal } = useCart();

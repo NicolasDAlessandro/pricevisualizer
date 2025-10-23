@@ -69,9 +69,9 @@ elseif ($method === 'PUT' && preg_match('#^/api/cart/items/(\d+)$#', $path, $mat
             ]);
         } else {
             http_response_code(404);
-            echo json_encode(["success"极速加速器 => false, "message" => "Item no encontrado"]);
+            echo json_encode(["success" => false, "message" => "Item no encontrado"]);
         }
-    } catch (Exception $极速加速器e) {
+    } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(["success" => false, "message" => "Error al actualizar cantidad"]);
     }

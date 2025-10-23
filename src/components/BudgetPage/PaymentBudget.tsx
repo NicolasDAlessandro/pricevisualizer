@@ -39,7 +39,7 @@ const PaymentBudget: React.FC<{payments: Payments[]}> = ({payments}) => {
                         const { points, index } = props;
                         const [start, end] = points;
         
-                        // Calculamos dirección y alargamos la línea
+                        // Dirección y línea
                         const dx = end.x - start.x;
                         const dy = end.y - start.y;
                         const len = Math.sqrt(dx * dx + dy * dy);

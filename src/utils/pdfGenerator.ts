@@ -90,8 +90,6 @@ export const generarPDF = async (
     it.qty,
   ]);
 
-
-
   autoTable(doc, {
     head: [["Producto", "Cantidad"]],
     body: productRows,

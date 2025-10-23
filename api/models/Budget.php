@@ -157,7 +157,7 @@ class Budget {
         $stmt->execute($params);
         $stats['presupuestos_por_vendedor'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // 🔹 Productos más presupuestados
+        // Productos más presupuestados
         $sql = "SELECT pr.id, pr.description AS producto, pr.category AS rubro, SUM(bi.cantidad) AS total
                 FROM budget_items bi
                 JOIN products pr ON bi.producto_id = pr.id
@@ -179,7 +179,7 @@ class Budget {
         $stmt->execute($params);
         $stats['productos_top'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // 🔹 Presupuestos por rubro
+        // Presupuestos por rubro
         $sql = "SELECT pr.category AS rubro, SUM(bi.cantidad) AS total
                 FROM budget_items bi
                 JOIN products pr ON bi.producto_id = pr.id
@@ -201,7 +201,7 @@ class Budget {
         $stmt->execute($params);
         $stats['presupuestos_por_rubro'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // 🔹 Formas de pago más usadas
+        // Formas de pago más usadas
         $sql = "SELECT p.description AS forma_pago, COUNT(*) AS total
                 FROM budget_payments bp
                 JOIN payments p ON bp.payment_id = p.id

@@ -28,7 +28,7 @@ const LandingPage: React.FC = () => {
           <span className="text-gray-350">Sistema de gestión de precios</span>
         </motion.h1>
 
-        {/* 👇 Renderizado condicional del botón de login */}
+        {/* Renderizado condicional del botón de login */}
         {!isAuthenticated ? (
           <motion.div
             initial={{ opacity: 0 }}

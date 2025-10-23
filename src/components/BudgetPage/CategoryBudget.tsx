@@ -18,7 +18,7 @@ const COLORS = [
 ];
 
 const CategoryBudget: React.FC<{ rubros: Rubro[] }> = ({ rubros }) => {
-  // 🔹 Convertimos a número y calculamos el total general
+
   const data = rubros.map((item) => ({
     ...item,
     total: Number(item.total),
@@ -26,7 +26,7 @@ const CategoryBudget: React.FC<{ rubros: Rubro[] }> = ({ rubros }) => {
 
   const total = data.reduce((acc, item) => acc + item.total, 0);
 
-  // 🔹 Filtramos los rubros que representen más del 1% del total
+  //  Filtrar rubros que representen más del 1% del total
   const filteredData = data.filter((item) => (item.total / total) * 100 >= 1);
 
   return (
@@ -38,7 +38,7 @@ const CategoryBudget: React.FC<{ rubros: Rubro[] }> = ({ rubros }) => {
       <div className="-mt-2">
         <ResponsiveContainer
           width="100%"
-          height={Math.min(900, 220 + filteredData.length * 28)} // Altura dinámica ajustada
+          height={Math.min(900, 220 + filteredData.length * 28)} 
           className="focus:outline-none"
         >
           <PieChart>
@@ -71,7 +71,7 @@ const CategoryBudget: React.FC<{ rubros: Rubro[] }> = ({ rubros }) => {
                 );
               }}
               label={({ name, percent, index, cx, cy, midAngle, outerRadius }: any) => {
-                // 🔹 Mostrar solo si el porcentaje es >= 1%
+                // Mostrar solo si el porcentaje es >= 1%
                 if (percent * 100 < 1) return null;
 
                 const RADIAN = Math.PI / 180;

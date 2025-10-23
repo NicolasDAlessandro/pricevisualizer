@@ -1,38 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { paymentService } from "../services/api";
 import { formatCurrency } from "../utils/formatCurrency";
-
-export type PaymentMethod = {
-  id: string;
-  name: string;
-  cuotas: number;
-  recargo: number; // 0.1 = 10%
-  metodo: string;
-};
+import type { PaymentDto } from "../types/Api";
 
 type PaymentOptionsProps = {
   price: number;
 };
 
 const PaymentOptions: React.FC<PaymentOptionsProps> = ({ price }) => {
-  const [methods, setMethods] = useState<PaymentMethod[]>([]);
+  const [methods, setMethods] = useState<PaymentDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadMethods = async () => {
       try {
-        const payments = await paymentService.getPayments();
-
-        const mapped: PaymentMethod[] = payments.map((p: any) => ({
-          id: String(p.id),
-          name: p.description,
-          cuotas: Number(p.installments) || 1,
-          recargo: Number(p.amount), // ya viene como 0.03 si es 3%
-          metodo: p.method,
-        }));
-
-        setMethods(mapped);
+        const payments: PaymentDto[] = await paymentService.getPayments();
+        setMethods(payments);
       } catch (err: any) {
         setError(err.response?.data?.message || "Error al cargar métodos de pago");
       } finally {
@@ -51,6 +35,10 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({ price }) => {
     return <p className="text-center text-red-500">{error}</p>;
   }
 
+  if (methods.length === 0) {
+    return <p className="text-center text-gray-400">No hay métodos de pago disponibles.</p>;
+  }
+
   return (
     <div className="overflow-x-auto">
       <div className="max-h-72 overflow-y-auto border border-gray-700 rounded-lg shadow bg-gray-800">
@@ -65,20 +53,21 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({ price }) => {
           </thead>
           <tbody className="text-center">
             {methods.map((method) => {
-              const esTarjeta = method.metodo.toLowerCase() !== "efectivo";
+              if (method.status !== 1) return null;
+              const esTarjeta = method.method.toLowerCase() !== "efectivo";
               const total = esTarjeta
-                ? price * (1 + method.recargo)
-                : price * (1 - method.recargo);
+                ? method.amount * (1 + 0) 
+                : method.amount;
 
-              const cuota = total / method.cuotas;
+              const cuota = total / (method.installments || 1);
 
               return (
                 <tr
                   key={method.id}
                   className="hover:bg-gray-700 transition-colors border-b border-gray-700"
                 >
-                  <td className="px-3 py-2 border border-gray-600">{method.name}</td>
-                  <td className="px-3 py-2 border border-gray-600">{method.cuotas}</td>
+                  <td className="px-3 py-2 border border-gray-600">{method.description}</td>
+                  <td className="px-3 py-2 border border-gray-600">{method.installments}</td>
                   <td className="px-3 py-2 border border-gray-600 text-blue-400 font-semibold">
                     ${formatCurrency(cuota)}
                   </td>
