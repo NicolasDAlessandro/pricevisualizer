@@ -1,6 +1,6 @@
 // CartPage/usePresupuesto.ts
 import { useMemo } from "react";
-import type { PaymentMethod } from "../PaymentOptions";
+import type { PaymentMethod } from "../Cart";
 
 export type PresupuestoItem = {
   nombre: string;

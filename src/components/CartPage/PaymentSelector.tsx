@@ -1,5 +1,5 @@
 import React from "react";
-import type { PaymentMethod } from "../PaymentOptions";
+import type { PaymentMethod } from "../Cart";
 
 type PaymentSelectorProps = {
   availableMethods: PaymentMethod[];

@@ -16,7 +16,7 @@ import usePresupuesto, {
   type PresupuestoPorProducto,
 } from "./CartPage/useBudget";
 
-type PaymentMethod = {
+export type PaymentMethod = {
   id: string;
   name: string;
   cuotas: number;

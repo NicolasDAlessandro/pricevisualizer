@@ -53,14 +53,14 @@ const PaymentOptions: React.FC<PaymentOptionsProps> = ({ price }) => {
           </thead>
           <tbody className="text-center">
             {methods.map((method) => {
-              if (method.status !== 1) return null;
-              const esTarjeta = method.method.toLowerCase() !== "efectivo";
-              const total = esTarjeta
-                ? method.amount * (1 + 0) 
-                : method.amount;
-
+              // Renderiza solo métodos activos
+              if (method.status !== 1) return null
+              
+              const recargo = method.amount / 1 ;
+              const esTarjeta = method.method.toLowerCase() !== "efectivo"; 
+              const total = esTarjeta ? price * (1 + recargo) : price * (1 - recargo); 
               const cuota = total / (method.installments || 1);
-
+          
               return (
                 <tr
                   key={method.id}
