@@ -36,19 +36,6 @@ Construida con **React 19**, **Vite 7**, **TypeScript** y **TailwindCSS 4**.
 
 ---
 
-##  Estructura del proyecto
-src/
-├── assets/ # Imágenes, íconos, logos
-├── components/ # Componentes reutilizables (UI, tablas, formularios)
-├── context/ # Contextos globales (AuthContext, CartContext)
-├── services/ # Llamadas a APIs / capa de servicios
-├── utils/ # Funciones auxiliares (PDF, formateos, helpers)
-├── types/ # Tipos y definiciones TypeScript
-├── App.tsx # Enrutamiento principal y proveedores
-├── main.tsx # Punto de entrada Vite
-└── index.css # Estilos base + Tailwind
-
----
 
 ##  Instalación
 
