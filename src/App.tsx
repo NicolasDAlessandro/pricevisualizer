@@ -43,7 +43,7 @@ const App: React.FC = () => {
               <Route
                 path="/upload"
                 element={
-                  <ProtectedRoute roles={["admin, gerente"]}>
+                  <ProtectedRoute roles={["admin", "gerente"]}>
                   <ProductUploader />
                   </ProtectedRoute>
                 }

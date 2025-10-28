@@ -1,26 +1,61 @@
-#  Visualizador de Precios
+# 🛒 Visualizador de Precios
 
-Aplicación web para gestionar y visualizar precios, presupuestos y métodos de pago.  
-Frontend hecho en **React + Vite + TypeScript + TailwindCSS**.  
-Backend (en desarrollo) será en **.NET + PostgreSQL**.
+Aplicación web moderna para **gestionar, visualizar y generar presupuestos** con distintos métodos de pago.  
+Incluye funciones de autenticación, carga de productos, generación de PDFs, estadísticas y más.  
+
+Construida con **React 19**, **Vite 7**, **TypeScript** y **TailwindCSS 4**.
 
 ---
 
-##  Requisitos
+## Tecnologías principales
 
-Antes de empezar asegurate de tener instalado:
+| Tipo | Tecnología |
+|------|-------------|
+| **Framework Frontend** | [React 19](https://react.dev/) + [Vite 7](https://vitejs.dev/) |
+| **Lenguaje** | [TypeScript 5](https://www.typescriptlang.org/) |
+| **Estilos** | [TailwindCSS 4](https://tailwindcss.com/) + [Flowbite](https://flowbite.com/docs/getting-started/react/) |
+| **Animaciones** | [Framer Motion](https://www.framer.com/motion/) |
+| **Gráficos / Reportes** | [Recharts](https://recharts.org/en-US/) |
+| **PDF Generator** | [jsPDF](https://github.com/parallax/jsPDF) + [jspdf-autotable](https://github.com/simonbengtsson/jsPDF-AutoTable) |
+| **Exportación Excel** | [xlsx](https://www.npmjs.com/package/xlsx) |
+| **Ruteo** | [React Router v6.30](https://reactrouter.com/en/main) |
+| **Linting** | [ESLint 9 + TypeScript ESLint](https://eslint.org/) |
 
-- [Node.js](https://nodejs.org/) (v18 o superior recomendado)
-- [npm](https://www.npmjs.com/) o [yarn](https://yarnpkg.com/) (cualquiera de los dos)
-- [.NET SDK](https://dotnet.microsoft.com/download) (para el backend, si lo vas a correr)
-- [PostgreSQL](https://www.postgresql.org/download/) (opcional por ahora, ya que los datos se manejan en `localStorage`)
+---
+
+##  Características
+
+- **Gestión de productos:** carga, actualización y visualización de listas de precios.  
+-  **Carrito interactivo:** selección de productos y cantidades con subtotal dinámico.  
+-  **Múltiples métodos de pago:** configurables desde el panel administrativo.  
+-  **Generación de presupuestos:** permite crear presupuestos combinados o por producto.  
+-  **Exportación PDF:** descarga automática con logo, garantías y formas de pago.  
+-  **Estadísticas y reportes:** gráficos de ventas o presupuestos con *Recharts*.  
+-  **Autenticación y roles:** control de acceso según tipo de usuario (`admin`, `gerente`, `vendedor`).  
+-  **Diseño responsive y moderno:** con TailwindCSS + Flowbite.  
+
+---
+
+##  Estructura del proyecto
+src/
+├── assets/ # Imágenes, íconos, logos
+├── components/ # Componentes reutilizables (UI, tablas, formularios)
+├── context/ # Contextos globales (AuthContext, CartContext)
+├── services/ # Llamadas a APIs / capa de servicios
+├── utils/ # Funciones auxiliares (PDF, formateos, helpers)
+├── types/ # Tipos y definiciones TypeScript
+├── App.tsx # Enrutamiento principal y proveedores
+├── main.tsx # Punto de entrada Vite
+└── index.css # Estilos base + Tailwind
 
 ---
 
 ##  Instalación
 
 Cloná este repositorio:
-  
+
 ```bash
-git clone https://github.com/tu-usuario/visualizador-precios.git
+git clone https://github.com/NicolasDAlessandro/pricevisualizer.git
 cd visualizador-precios
+npm install
+npm run dev

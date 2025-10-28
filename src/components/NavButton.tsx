@@ -42,7 +42,7 @@ const NavButton: React.FC = () => {
           </li>
 
           {/* Solo admin */}
-          {user?.role === "admin" && (
+          {(user?.role === "admin" )&&( 
             <li>
               <Link
                 to="/upload"
