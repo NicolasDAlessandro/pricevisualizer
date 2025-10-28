@@ -1,4 +1,4 @@
-# 🛒 Visualizador de Precios
+# Visualizador de Precios
 
 Aplicación web moderna para **gestionar, visualizar y generar presupuestos** con distintos métodos de pago.  
 Incluye funciones de autenticación, carga de productos, generación de PDFs, estadísticas y más.  
